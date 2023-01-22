@@ -18,7 +18,7 @@ The code published here is experimental code implemented during my research at d
 To get started, please see <a href="https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/gettingStarted.md">this document.</a>
 
 # References
-
+#We have to learn these things first
 HTM School:
 https://www.youtube.com/playlist?list=PL3yXMgtrZmDqhsFQzwUC9V8MeeVOQ7eZ9&app=desktop
 
