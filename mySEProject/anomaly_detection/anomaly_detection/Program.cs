@@ -45,7 +45,7 @@ namespace NeoCortexApiSample
             var predictor = experiment.Run(sequences);
         }
 
-
+        int[] TestNum = { 10, 20, 30, 40 };
 
     }
 }
