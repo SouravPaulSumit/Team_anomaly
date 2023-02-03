@@ -59,26 +59,33 @@ namespace NeoCortexApiSample
             //SequenceLearning experiment = new SequenceLearning();
             //experiment.Run();
 
-            // RunMultiSimpleSequenceLearningExperiment();
+            //RunMultiSimpleSequenceLearningExperiment();
 
-            CSVFileReader cv = new CSVFileReader(@"D:\general\test_file.csv", 2);
+            /*CSVFileReader cv = new CSVFileReader(@"D:\general\test_file.csv", 2);
             
             foreach (double k in cv.ReadFile())
             {
                 Console.WriteLine(k);
-            }
+            }*/
         }
 
         private static void RunMultiSimpleSequenceLearningExperiment()
         {
             Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
+
             List<double> testsequence = new List<double>();
+            
             CSVFileReader cv = new CSVFileReader(@"D:\general\test_file.csv", 2);
+
             testsequence.AddRange(cv.ReadFile());
 
-            sequences.Add("S1", new List<double>(new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, }));
-            sequences.Add("S2", new List<double>(new double[] { 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0 }));
+            List<double> finaltestsequence1 = testsequence.GetRange(0,7);
+            List<double> finaltestsequence2 = testsequence.GetRange(14, 21);
 
+            //sequences.Add("S1", new List<double>(new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, }));
+            //sequences.Add("S1", new List<double>(testsequence));
+            //sequences.Add("S2", new List<double>(new double[] { 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0 }));
+            //sequences.Add("S2", new List<double>(testsequence));
             //
             // Prototype for building the prediction engine.
             MultiSequenceLearning experiment = new MultiSequenceLearning();
