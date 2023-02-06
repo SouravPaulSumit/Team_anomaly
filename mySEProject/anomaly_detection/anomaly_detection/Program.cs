@@ -19,6 +19,9 @@ namespace NeoCortexApiSample
         private string _filePathToCSV;
         private int _columnIndex;
 
+
+        //data from https://github.com/numenta/NAB/blob/master/data/realTraffic/speed_7578.csv
+
         public CSVFileReader(string filePathToCSV = "", int columnIndex = 0)
         {
             _filePathToCSV = filePathToCSV;
@@ -33,9 +36,18 @@ namespace NeoCortexApiSample
             for (int i = 1; i < csvLines.Length; i++)
             {
                 string[] columns = csvLines[i].Split(new char[] { ',', '"' });
-                inputnumbers.Add(double.Parse(columns[_columnIndex]));
+                inputnumbers.Add((double.Parse(columns[_columnIndex])/10));
             }
             return inputnumbers;
+        }
+
+        public void SequenceConsoleOutput() {
+
+           foreach (double k in ReadFile())
+            {
+                Console.WriteLine(k);
+            }
+
         }
     }
     
@@ -60,13 +72,10 @@ namespace NeoCortexApiSample
             //experiment.Run();
 
             RunMultiSimpleSequenceLearningExperiment();
+            //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
+            //cv.SequenceConsoleOutput();
 
-            /*CSVFileReader cv = new CSVFileReader(@"D:\general\test_file.csv", 2);
-            
-            foreach (double k in cv.ReadFile())
-            {
-                Console.WriteLine(k);
-            }*/
+
         }
         
         private static void RunMultiSimpleSequenceLearningExperiment()
@@ -75,12 +84,12 @@ namespace NeoCortexApiSample
 
             List<double> testsequence = new List<double>();
             
-            CSVFileReader cv = new CSVFileReader(@"D:\general\test_file.csv", 2);
+            CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
 
             testsequence.AddRange(cv.ReadFile());
 
-            List<double> finaltestsequence1 = testsequence.GetRange(0,7);
-            List<double> finaltestsequence2 = testsequence.GetRange(14, 21);
+            List<double> finaltestsequence1 = testsequence.GetRange(0,6);
+            List<double> finaltestsequence2 = testsequence.GetRange(14,20);
 
             //sequences.Add("S1", new List<double>(new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, }));
             sequences.Add("S1", new List<double>(finaltestsequence1));
@@ -152,9 +161,3 @@ namespace NeoCortexApiSample
         }
     }
 }
-
-}
-    
-
-    
-    
