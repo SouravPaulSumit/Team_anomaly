@@ -295,5 +295,22 @@ namespace NeoCortexApiSample
 
             Debug.WriteLine("------------------------------");
         }
+
+
+        private static double[] TestAnomaly()
+        {
+            List<double> anomalytestsequence = new List<double>();
+
+            CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
+
+            anomalytestsequence.AddRange(cv.ReadFile());
+
+            var anomalytestlist1_d = anomalytestsequence.GetRange(1000, 50);
+
+            double[] anomalytestlist1 = anomalytestlist1_d.ToArray();
+
+            return anomalytestlist1;
+
+        }
     }
 }
