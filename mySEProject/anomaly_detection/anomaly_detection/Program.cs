@@ -108,10 +108,10 @@ namespace NeoCortexApiSample
             //experiment.Run();
 
             //RunModifiedMultiSimpleSequenceLearningExperiment();
-            RunMultiSimpleSequenceLearningExperiment();
+            //RunMultiSimpleSequenceLearningExperiment();
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
-            //RunMultiSequenceLearningExperiment();
+            RunMultiSequenceLearningExperiment();
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
             //cv.SequenceConsoleOutput();
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
@@ -230,12 +230,12 @@ namespace NeoCortexApiSample
 
             testsequence.AddRange(cv.ReadFile());
 
-            List<double> finaltestsequence1 = testsequence.GetRange(0, 30);
-            List<double> finaltestsequence2 = testsequence.GetRange(600, 30);
+            List<double> finaltestsequence1 = testsequence.GetRange(0, 700);
+            //List<double> finaltestsequence2 = testsequence.GetRange(600, 30);
 
 
             sequences.Add("S1", finaltestsequence1);
-            sequences.Add("S2", finaltestsequence2);
+            //sequences.Add("S2", finaltestsequence2);
 
 
 
@@ -253,16 +253,16 @@ namespace NeoCortexApiSample
             var list2 = new double[] { 2.0, 3.0, 4.0 };
             var list3 = new double[] { 8.0, 1.0, 2.0 };*/
 
-            var list1_d = testsequence.GetRange(400, 30);
-            double[] list1 = list1_d.ToArray();
+            //var list1_d = testsequence.GetRange(400, 30);
+            //double[] list1 = list1_d.ToArray();
 
             //var list2_d = testsequence.GetRange(250, 6);
             //double[] list2 = list2_d.ToArray();
             //var list3_d = testsequence.GetRange(350, 6);
             //double[] list3 = list3_d.ToArray();
 
-            predictor.Reset();
-            PredictNextElement(predictor, list1);
+            //predictor.Reset();
+            //redictNextElement(predictor, list1);
 
             /*predictor.Reset();
             PredictNextElement(predictor, list2);
