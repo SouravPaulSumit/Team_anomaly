@@ -230,7 +230,7 @@ namespace NeoCortexApiSample
 
             testsequence.AddRange(cv.ReadFile());
 
-            List<double> finaltestsequence1 = testsequence.GetRange(0, 700);
+            List<double> finaltestsequence1 = testsequence.GetRange(0, 100);
             //List<double> finaltestsequence2 = testsequence.GetRange(600, 30);
 
 
@@ -261,8 +261,13 @@ namespace NeoCortexApiSample
             //var list3_d = testsequence.GetRange(350, 6);
             //double[] list3 = list3_d.ToArray();
 
-            //predictor.Reset();
-            //redictNextElement(predictor, list1);
+            
+
+            double[] list1 = TestAnomaly(1000, 20);
+
+            predictor.Reset();
+            PredictNextElement(predictor, list1);
+
 
             /*predictor.Reset();
             PredictNextElement(predictor, list2);
@@ -297,7 +302,7 @@ namespace NeoCortexApiSample
         }
 
 
-        private static double[] TestAnomaly()
+        private static double[] TestAnomaly(int a, int b)
         {
             List<double> anomalytestsequence = new List<double>();
 
@@ -305,7 +310,7 @@ namespace NeoCortexApiSample
 
             anomalytestsequence.AddRange(cv.ReadFile());
 
-            var anomalytestlist1_d = anomalytestsequence.GetRange(1000, 50);
+            var anomalytestlist1_d = anomalytestsequence.GetRange(a, b);
 
             double[] anomalytestlist1 = anomalytestlist1_d.ToArray();
 
