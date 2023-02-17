@@ -362,5 +362,24 @@ namespace NeoCortexApiSample
             return anomalytestlist1;
 
         }
+        
+        public static int[] GenerateRandomSequenceWithTrend(int length, int baseValue, double trend, double mean, double stdDev)
+        {
+            Random random = new Random();
+            int[] sequence = new int[length];
+
+            for (int i = 0; i < sequence.Length; i++)
+            {
+                double randomValue = random.NextDouble();
+                double scalingFactor = 1 + (trend * (i - length / 2) / (length / 2));
+                double scaledValue = scalingFactor * (mean + stdDev * Math.Sqrt(-2.0 * Math.Log(randomValue)) * Math.Cos(2.0 * Math.PI * random.NextDouble()));
+                int value = baseValue + Convert.ToInt32(scaledValue * baseValue);
+                sequence[i] = value;
+            }
+
+            return sequence;
+        }
+
     }
 }
+
