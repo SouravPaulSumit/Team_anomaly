@@ -380,6 +380,63 @@ namespace NeoCortexApiSample
             return sequence;
         }
 
+
+        public static int[] GenerateRandomSequenceWithAnomalies(int length, int baseValue, double trend, double mean, double stdDev, double anomalyProbability, double anomalyFactor)
+        {
+            // Create a new random number generator 
+            Random random = new Random();
+
+            // Create an array to hold the generated sequence 
+            int[] sequence = new int[length];
+
+            // Loop through each element in the sequence 
+            for (int i = 0; i < sequence.Length; i++)
+            {
+                // Generate a random number between 0 and 1 
+                double randomValue = random.NextDouble();
+
+                // Calculate a scaling factor based on the position in the sequence and the trend 
+                double scalingFactor = 1 + (trend * (i - length / 2) / (length / 2));
+
+                // Calculate a scaled random value using the Box-Muller transform 
+                double scaledValue = scalingFactor * (mean + stdDev * Math.Sqrt(-2.0 * Math.Log(randomValue)) * Math.Cos(2.0 * Math.PI * random.NextDouble()));
+
+                // Convert the scaled value to an integer and add it to the base value 
+                int value = baseValue + Convert.ToInt32(scaledValue * baseValue);
+
+                // Introduce an anomaly with a specified probability 
+                if (random.NextDouble() < anomalyProbability)
+                {
+                    // Generate a new random value for the anomaly 
+                    double anomalyRandomValue = random.NextDouble();
+
+                    // Calculate a scaling factor for the anomaly based on the position in the sequence and the anomaly factor 
+                    double anomalyScalingFactor = 1 + (anomalyFactor * (i - length / 2) / (length / 2));
+
+                    // Calculate a scaled random value for the anomaly using the Box-Muller transform 
+                    double anomalyScaledValue = anomalyScalingFactor * (mean + stdDev * Math.Sqrt(-2.0 * Math.Log(anomalyRandomValue)) * Math.Cos(2.0 * Math.PI * random.NextDouble()));
+
+                    // Convert the scaled value to an integer and use it as the anomaly value 
+                    int anomalyValue = baseValue + Convert.ToInt32(anomalyScaledValue * baseValue);
+
+                    // Use the anomaly value instead of the generated value 
+                    value = anomalyValue;
+                }
+
+                // Make sure the value does not exceed 20 
+                if (value > 20)
+                {
+                    value = 20;
+                }
+
+                // Add the value to the sequence 
+                sequence[i] = value;
+            }
+
+            // Return the generated sequence 
+            return sequence;
+        }
+
     }
 }
 
