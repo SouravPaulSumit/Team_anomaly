@@ -112,7 +112,7 @@ namespace NeoCortexApiSample
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
             //RunMultiSequenceLearningExperiment();
-            //TestLogMultisequenceExperiment();
+            TestLogMultisequenceExperiment(10);
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
             //cv.SequenceConsoleOutput();
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
@@ -209,6 +209,7 @@ namespace NeoCortexApiSample
             }
             Console.WriteLine("Sequences fed into experiment");
 
+
             //
             // Prototype for building the prediction engine.
             MultiSequenceLearning experiment = new MultiSequenceLearning();
@@ -264,10 +265,10 @@ namespace NeoCortexApiSample
 
 
 
-            double[] list1 = TestAnomaly(1000, 10);
+            //double[] list1 = TestAnomaly(1000, 10);
 
-            predictor.Reset();
-            PredictNextElement(predictor, list1);
+            //predictor.Reset();
+            //PredictNextElement(predictor, list1);
 
 
             /*predictor.Reset();
@@ -277,49 +278,64 @@ namespace NeoCortexApiSample
             PredictNextElement(predictor, list3);*/
         }
 
-
-        private static void TestLogMultisequenceExperiment()
+        private static void TestLogMultisequenceExperiment(int a)
         {
-            Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
 
             List<double> testsequence = new List<double>();
 
-            CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
+            List<List<double>> listofsequences = new List<List<double>>();
 
-            testsequence.AddRange(cv.ReadFile());
+            int[] array1 = Enumerable.Range(0, a).Select(x => x * 50).ToArray();
+            int[] array2 = Enumerable.Range(1, a).Select(x => x * 5).ToArray();
 
-            for (int i = 10; i < 50; i += 5)
+
+            for (int i = 0; i < a; i++)
             {
-                Stopwatch swh = new Stopwatch();
+                List<double> singleseq = TestAnomaly(array1[i], array2[i]);
+                listofsequences.Add(singleseq);
+            }
 
-                swh.Start();
+            List<string> stringstream = new List<string>();
 
-                List<double> finaltestsequence1 = testsequence.GetRange(0, i);
+            for (int i = 1; i <= listofsequences.Count; i++)
+            {
+                stringstream.Add("S" + i);
+            }
 
-                sequences.Add("S1", finaltestsequence1);
+            Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
 
-                //
-                // Prototype for building the prediction engine.
+            for (int i = 0; i < a; i++)
+            {
+                sequences.Add(stringstream[i], listofsequences[i]);
 
+            }
+
+            foreach (KeyValuePair<string, List<double>> item in sequences)
+            {
+                Console.Write("Key: {0}; Count of values in sequence: {1}, Values are: ", item.Key, item.Value.Count);
+                foreach (double value in item.Value)
+                {
+                    Console.Write("{0},", value);
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("These sequences that will be used for experiment");
+
+
+            foreach (KeyValuePair<string, List<double>> dictitr in sequences)
+            {
+                Dictionary<string, List<double>> usefuldict = new Dictionary<string, List<double>>() { { dictitr.Key, dictitr.Value } };
+                Stopwatch swh = Stopwatch.StartNew();
                 MultiSequenceLearning experiment = new MultiSequenceLearning();
-                var predictor = experiment.Run(sequences);
-
-                double[] list1 = TestAnomaly(1000, i);
-
-                predictor.Reset();
-                PredictNextElement(predictor, list1);
-
+                var predictor = experiment.Run(usefuldict);
                 swh.Stop();
-
-                TimeSpan runtime = swh.Elapsed;
-
-                Console.WriteLine("Runtime for experiment with " + i + "elements are" + runtime);
+                Console.WriteLine("Elapsed time for {0}: {1} ms", dictitr.Key, swh.ElapsedMilliseconds);
             }
 
 
-
-
         }
+
         private static void PredictNextElement(Predictor predictor, double[] list)
         {
             Debug.WriteLine("------------------------------");
@@ -347,7 +363,7 @@ namespace NeoCortexApiSample
         }
 
 
-        private static double[] TestAnomaly(int a, int b)
+        private static List<double> TestAnomaly(int a, int b)
         {
             List<double> anomalytestsequence = new List<double>();
 
@@ -357,12 +373,13 @@ namespace NeoCortexApiSample
 
             var anomalytestlist1_d = anomalytestsequence.GetRange(a, b);
 
-            double[] anomalytestlist1 = anomalytestlist1_d.ToArray();
+            //double[] anomalytestlist1 = anomalytestlist1_d.ToArray();
 
-            return anomalytestlist1;
+            //return anomalytestlist1;
+            return anomalytestlist1_d;
 
         }
-        
+
         public static int[] GenerateRandomSequenceWithTrend(int length, int baseValue, double trend, double mean, double stdDev)
         {
             Random random = new Random();
