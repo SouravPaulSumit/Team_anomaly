@@ -113,6 +113,22 @@ namespace NeoCortexApiSample
             //stopwatch.Start();
             //RunMultiSequenceLearningExperiment();
             TestLogMultisequenceExperiment(10);
+            int[] sequence1 = GenerateRandomSequenceWithTrend(10, 100, 0.1, 0.0, 1.0);
+            int[] sequence2 = GenerateRandomSequenceWithTrend(20, 50, -0.2, 0.0, 2.0);
+            int[] sequence3 = GenerateRandomSequenceWithTrend(5, 200, 0.05, 0.0, 10.0);
+
+            int[][] sequences = new int[][] { sequence1, sequence2, sequence3 };
+
+           foreach (int[] sequence in sequences)
+           {
+               Console.WriteLine("Sequence:");
+                 foreach (int value in sequence)
+                   {
+                      Console.WriteLine(value);
+                    }
+                 Console.WriteLine();
+            }
+
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
             //cv.SequenceConsoleOutput();
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
