@@ -380,20 +380,36 @@ namespace NeoCortexApiSample
 
         }
 
+        
+
         public static int[] GenerateRandomSequenceWithTrend(int length, int baseValue, double trend, double mean, double stdDev)
         {
+            // Create a new Random object to generate random numbers
             Random random = new Random();
+
+            // Create a new int array to hold the generated sequence
             int[] sequence = new int[length];
 
+            // Iterate over each element of the sequence array
             for (int i = 0; i < sequence.Length; i++)
             {
+                // Generate a random value between 0 and 1
                 double randomValue = random.NextDouble();
+
+                // Calculate the scaling factor for this element based on the trend
                 double scalingFactor = 1 + (trend * (i - length / 2) / (length / 2));
+
+                // Calculate the scaled random value using the mean, standard deviation, and scaling factor
                 double scaledValue = scalingFactor * (mean + stdDev * Math.Sqrt(-2.0 * Math.Log(randomValue)) * Math.Cos(2.0 * Math.PI * random.NextDouble()));
+
+                // Convert the scaled value to an integer by multiplying it by the base value and rounding to the nearest integer
                 int value = baseValue + Convert.ToInt32(scaledValue * baseValue);
+
+                // Store the integer value in the current element of the sequence array
                 sequence[i] = value;
             }
 
+            // Return the generated sequence
             return sequence;
         }
 
