@@ -139,6 +139,43 @@ namespace NeoCortexApiSample
 
         }
 
+        private static void RunTestingMultiSequenceLearningExperiment()
+        {
+            Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
+
+            List<double> testsequence = new List<double>();
+
+            CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
+
+            testsequence.AddRange(cv.ReadFile());
+
+            List<double> finaltestsequence1 = testsequence.GetRange(0, 30);
+            List<double> finaltestsequence2 = testsequence.GetRange(300, 30);
+            List<double> finaltestsequence3 = testsequence.GetRange(600, 30);
+
+            sequences.Add("S1", finaltestsequence1);
+            sequences.Add("S2", finaltestsequence2);
+            sequences.Add("S3", finaltestsequence3);
+
+
+            //
+            // Prototype for building the prediction engine.
+
+            MultiSequenceLearning experiment = new MultiSequenceLearning();
+            var predictor = experiment.Run(sequences);
+
+            //
+            // These list are used to see how the prediction works.
+            // Predictor is traversing the list element by element. 
+            // By providing more elements to the prediction, the predictor delivers more precise result.
+
+            var list1 = TestAnomaly(310, 10);
+
+            predictor.Reset();
+            ExperimentPredict(predictor, list1);
+
+        }
+
         private static void RunMultiSimpleSequenceLearningExperiment()
         {
             Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
