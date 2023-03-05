@@ -165,7 +165,7 @@ namespace NeoCortexApiSample
             }
 
             // Clear all learned patterns in the classifier.
-            cls.ClearState();
+            //cls.ClearState();
 
             // We activate here the Temporal Memory algorithm.
             layer1.HtmModules.Add("tm", tm);
