@@ -107,12 +107,14 @@ namespace NeoCortexApiSample
             //SequenceLearning experiment = new SequenceLearning();
             //experiment.Run();
 
+            RunTestingMultiSequenceLearningExperiment();
+
             //RunModifiedMultiSimpleSequenceLearningExperiment();
             //RunMultiSimpleSequenceLearningExperiment();
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
             //RunMultiSequenceLearningExperiment();
-            TestLogMultisequenceExperiment(10);
+            /*TestLogMultisequenceExperiment(10);
             int[] sequence1 = GenerateRandomSequenceWithTrend(10, 100, 0.1, 0.0, 1.0);
             int[] sequence2 = GenerateRandomSequenceWithTrend(20, 50, -0.2, 0.0, 2.0);
             int[] sequence3 = GenerateRandomSequenceWithTrend(5, 200, 0.05, 0.0, 10.0);
@@ -127,7 +129,7 @@ namespace NeoCortexApiSample
                       Console.WriteLine(value);
                     }
                  Console.WriteLine();
-            }
+            }*/
 
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
             //cv.SequenceConsoleOutput();
@@ -174,6 +176,32 @@ namespace NeoCortexApiSample
             predictor.Reset();
             ExperimentPredict(predictor, list1);
 
+        }
+
+        private static void ExperimentPredict(Predictor predictor, double[] list)
+        {
+            Console.WriteLine("------------------------------");
+
+            foreach (var item in list)
+            {
+                var res = predictor.Predict(item);
+
+                if (res.Count > 0)
+                {
+                    foreach (var pred in res)
+                    {
+                        Console.WriteLine($"{pred.PredictedInput} - {pred.Similarity}");
+                    }
+
+                    var tokens = res.First().PredictedInput.Split('_');
+                    var tokens2 = res.First().PredictedInput.Split('-');
+                    Console.WriteLine($"Predicted Sequence: {tokens[0]}, predicted next element {tokens2.Last()}");
+                }
+                else
+                    Console.WriteLine("Nothing predicted :(");
+            }
+
+            Console.WriteLine("------------------------------");
         }
 
         private static void RunMultiSimpleSequenceLearningExperiment()
@@ -331,7 +359,7 @@ namespace NeoCortexApiSample
             PredictNextElement(predictor, list3);*/
         }
 
-        private static void TestLogMultisequenceExperiment(int a)
+        /*private static void TestLogMultisequenceExperiment(int a)
         {
 
             List<double> testsequence = new List<double>();
@@ -387,7 +415,7 @@ namespace NeoCortexApiSample
             }
 
 
-        }
+        }*/
 
         private static void PredictNextElement(Predictor predictor, double[] list)
         {
@@ -416,7 +444,7 @@ namespace NeoCortexApiSample
         }
 
 
-        private static List<double> TestAnomaly(int a, int b)
+        private static double[] TestAnomaly(int a, int b)
         {
             List<double> anomalytestsequence = new List<double>();
 
@@ -426,10 +454,10 @@ namespace NeoCortexApiSample
 
             var anomalytestlist1_d = anomalytestsequence.GetRange(a, b);
 
-            //double[] anomalytestlist1 = anomalytestlist1_d.ToArray();
+            double[] anomalytestlist1 = anomalytestlist1_d.ToArray();
 
-            //return anomalytestlist1;
-            return anomalytestlist1_d;
+            return anomalytestlist1;
+            //return anomalytestlist1_d;
 
         }
 
