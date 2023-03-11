@@ -194,8 +194,60 @@ namespace NeoCortexApiSample
                 else
                     Console.WriteLine("Nothing predicted. Anomaly can't be detected");
             }
-
             
+        }
+        
+        private static void TestPredictNextElement(Predictor predictor, double[] list)
+        {
+            double tolerance = 1;
+            for (int i = 0; i < list.Length; i++)
+            {
+                var item = list[i];
+                var res = predictor.Predict(item);
+                Console.WriteLine("Current element: " + item);
+                if (res.Count > 0)
+                {
+                    var tokens = res.First().PredictedInput.Split('_');
+                    var tokens2 = res.First().PredictedInput.Split('-');
+                    if (i < list.Length - 1) // exclude the last element of the list
+                    {
+                        int nextIndex = i + 1;
+                        double nextItem = list[nextIndex];
+                        double predictedNextItem = double.Parse(tokens2.Last());
+                        Console.WriteLine($"Predicted Sequence: {tokens[0]}, predicted next element {predictedNextItem}");
+                        if (Math.Abs(predictedNextItem - nextItem) <= tolerance)
+                        {
+                            Console.WriteLine("Equal");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Not equal. Anomaly detected: predicted next element is {predictedNextItem}, actual next element is {nextItem}");
+                        }
+                    }
+                    else if (i == list.Length - 1 && tokens2.Length > 1) // handle the last element of the list
+                    {
+                        double predictedNextItem = double.Parse(tokens2.Last());
+                        double lastItem = list.Last();
+                        Console.WriteLine($"Predicted Sequence: {tokens[0]}, predicted next element {predictedNextItem}");
+                        if (Math.Abs(predictedNextItem - lastItem) <= tolerance)
+                        {
+                            Console.WriteLine("Equal");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Not equal. Anomaly detected: predicted next element is {predictedNextItem}, actual next element is {lastItem}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("End of list. Anomaly can't be detected");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nothing predicted. Anomaly can't be detected");
+                }
+            }
         }
 
         private static void RunMultiSimpleSequenceLearningExperiment()
