@@ -16,7 +16,7 @@ using System.Collections;
 
 namespace NeoCortexApiSample
 {
-    class CSVFileReader
+    /*class CSVFileReader
     {
         private string _filePathToCSV;
         private int _columnIndex;
@@ -85,7 +85,96 @@ namespace NeoCortexApiSample
 
             }
         }
+    }*/
+    
+    public class CSVFileReader
+    {
+        private string _filePathToCSV;
+
+        public CSVFileReader(string filePathToCSV)
+        {
+            _filePathToCSV = filePathToCSV;
+        }
+
+        public List<List<double>> ReadFile()
+        {
+            List<List<double>> sequences = new List<List<double>>();
+            string[] csvLines = File.ReadAllLines(_filePathToCSV);
+            for (int i = 0; i < csvLines.Length; i++)
+            {
+                string[] columns = csvLines[i].Split(new char[] { ',' });
+                List<double> sequence = new List<double>();
+                for (int j = 0; j < columns.Length; j++)
+                {
+                    sequence.Add(double.Parse(columns[j]));
+                }
+                sequences.Add(sequence);
+            }
+            return sequences;
+        }
+
+        public void CSVSequencesConsoleOutput()
+        {
+            List<List<double>> sequences = ReadFile();
+            for (int i = 0; i < sequences.Count; i++)
+            {
+                Console.Write("Sequence " + (i + 1) + ": ");
+                foreach (double number in sequences[i])
+                {
+                    Console.Write(number + " ");
+                }
+                Console.WriteLine("");
+            }
+        }
     }
+
+    public class CSVFolderReader
+    {
+        private string _folderPathToCSV;
+
+        public CSVFolderReader(string folderPathToCSV)
+        {
+            _folderPathToCSV = folderPathToCSV;
+        }
+
+        public List<List<double>> ReadFolder()
+        {
+            List<List<double>> folderSequences = new List<List<double>>();
+            string[] fileEntries = Directory.GetFiles(_folderPathToCSV, "*.csv");
+            foreach (string fileName in fileEntries)
+            {
+                string[] csvLines = File.ReadAllLines(fileName);
+                List<List<double>> sequencesInFile = new List<List<double>>();
+                for (int i = 0; i < csvLines.Length; i++)
+                {
+                    string[] columns = csvLines[i].Split(new char[] { ',' });
+                    List<double> sequence = new List<double>();
+                    for (int j = 0; j < columns.Length; j++)
+                    {
+                        sequence.Add(double.Parse(columns[j]));
+                    }
+                    sequencesInFile.Add(sequence);
+                }
+                folderSequences.AddRange(sequencesInFile);
+            }
+            return folderSequences;
+        }
+
+        public void CSVSequencesConsoleOutput()
+        {
+            List<List<double>> sequences = ReadFolder();
+            for (int i = 0; i < sequences.Count; i++)
+            {
+                Console.Write("Sequence " + (i + 1) + ": ");
+                foreach (double number in sequences[i])
+                {
+                    Console.Write(number + " ");
+                }
+                Console.WriteLine("");
+            }
+        }
+    }   
+    
 
     class Program
     {
@@ -114,22 +203,8 @@ namespace NeoCortexApiSample
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
             //RunMultiSequenceLearningExperiment();
-            /*TestLogMultisequenceExperiment(10);
-            int[] sequence1 = GenerateRandomSequenceWithTrend(10, 100, 0.1, 0.0, 1.0);
-            int[] sequence2 = GenerateRandomSequenceWithTrend(20, 50, -0.2, 0.0, 2.0);
-            int[] sequence3 = GenerateRandomSequenceWithTrend(5, 200, 0.05, 0.0, 10.0);
-
-            int[][] sequences = new int[][] { sequence1, sequence2, sequence3 };
-
-           foreach (int[] sequence in sequences)
-           {
-               Console.WriteLine("Sequence:");
-                 foreach (int value in sequence)
-                   {
-                      Console.WriteLine(value);
-                    }
-                 Console.WriteLine();
-            }*/
+            //TestLogMultisequenceExperiment(10);
+            
 
             //CSVFileReader cv = new CSVFileReader(@"D:\general\test_file2.csv", 2);
             //cv.SequenceConsoleOutput();
