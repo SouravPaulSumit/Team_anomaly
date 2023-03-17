@@ -16,77 +16,7 @@ using System.Collections;
 
 namespace NeoCortexApiSample
 {
-    /*class CSVFileReader
-    {
-        private string _filePathToCSV;
-        private int _columnIndex;
-
-
-        //data from https://github.com/numenta/NAB/blob/master/data/realTraffic/speed_7578.csv
-
-        public CSVFileReader(string filePathToCSV = "", int columnIndex = 0)
-        {
-            _filePathToCSV = filePathToCSV;
-            _columnIndex = columnIndex;
-        }
-
-        public List<double> ReadFile()
-        {
-            // method implementation
-            List<double> inputnumbers = new List<double>();
-            string[] csvLines = File.ReadAllLines(_filePathToCSV);
-            for (int i = 1; i < csvLines.Length; i++)
-            {
-                string[] columns = csvLines[i].Split(new char[] { ',', '"' });
-                inputnumbers.Add((double.Parse(columns[_columnIndex]) / 10));
-            }
-            return inputnumbers;
-        }
-
-        public void SequenceConsoleOutput()
-        {
-
-            foreach (double k in ReadFile())
-            {
-                Console.WriteLine(k);
-            }
-
-        }
-        public void OutSeq()
-        {
-            List<double> testsequence = new List<double>();
-
-            testsequence.AddRange(ReadFile());
-
-            List<double> finaltestsequence1 = testsequence.GetRange(0, 50);
-            List<double> finaltestsequence2 = testsequence.GetRange(400, 50);
-            List<double> finaltestsequence3 = testsequence.GetRange(600, 50);
-
-            foreach (double i in finaltestsequence1)
-            {
-                Console.Write(i + " ");
-
-            }
-            Console.WriteLine();
-            Console.WriteLine("Next Sequence");
-
-            foreach (double i in finaltestsequence2)
-            {
-                Console.Write(i + " ");
-
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Next Sequence");
-
-            foreach (double i in finaltestsequence3)
-            {
-                Console.Write(i + " ");
-
-            }
-        }
-    }*/
-    
+      
     public class CSVFileReader
     {
         private string _filePathToCSV;
@@ -173,7 +103,46 @@ namespace NeoCortexApiSample
                 Console.WriteLine("");
             }
         }
-    }   
+    }
+    
+    public class CSVToHTMInput
+    {
+        public Dictionary<string, List<double>> BuildHTMInput(List<List<double>> sequences)
+        {
+            Dictionary<string, List<double>> dictionary = new Dictionary<string, List<double>>();
+            for (int i = 0; i < sequences.Count; i++)
+            {
+                string key = "S" + (i + 1);
+                List<double> value = sequences[i];
+                dictionary.Add(key, value);
+            }
+            return dictionary;
+        }
+    }
+
+    public class AnomalyThreshold
+    {
+        public double CalculateThreshold(List<List<double>> sequences)
+        {
+            List<double> allNumbers = new List<double>();
+            foreach (List<double> sequence in sequences)
+            {
+                allNumbers.AddRange(sequence);
+            }
+            double mean = allNumbers.Average();
+            double stdDev = Math.Sqrt(allNumbers.Average(v => Math.Pow(v - mean, 2)));
+
+            double threshold = Math.Abs(mean + (3 * stdDev));
+            double roundedthreshold = Math.Round(threshold);
+            return roundedthreshold;
+        }
+
+        public void ShowThreshold(List<List<double>> sequences)
+        {
+            double threshold = CalculateThreshold(sequences);
+            Console.WriteLine("The threshold value is: " + threshold);
+        }
+    }
     
 
     class Program
@@ -480,64 +449,7 @@ namespace NeoCortexApiSample
             PredictNextElement(predictor, list3);*/
         }
 
-        /*private static void TestLogMultisequenceExperiment(int a)
-        {
-
-            List<double> testsequence = new List<double>();
-
-            List<List<double>> listofsequences = new List<List<double>>();
-
-            int[] array1 = Enumerable.Range(0, a).Select(x => x * 50).ToArray();
-            int[] array2 = Enumerable.Range(1, a).Select(x => x * 5).ToArray();
-
-
-            for (int i = 0; i < a; i++)
-            {
-                List<double> singleseq = TestAnomaly(array1[i], array2[i]);
-                listofsequences.Add(singleseq);
-            }
-
-            List<string> stringstream = new List<string>();
-
-            for (int i = 1; i <= listofsequences.Count; i++)
-            {
-                stringstream.Add("S" + i);
-            }
-
-            Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
-
-            for (int i = 0; i < a; i++)
-            {
-                sequences.Add(stringstream[i], listofsequences[i]);
-
-            }
-
-            foreach (KeyValuePair<string, List<double>> item in sequences)
-            {
-                Console.Write("Key: {0}; Count of values in sequence: {1}, Values are: ", item.Key, item.Value.Count);
-                foreach (double value in item.Value)
-                {
-                    Console.Write("{0},", value);
-                }
-                Console.WriteLine();
-            }
-
-            Console.WriteLine("These sequences that will be used for experiment");
-
-
-            foreach (KeyValuePair<string, List<double>> dictitr in sequences)
-            {
-                Dictionary<string, List<double>> usefuldict = new Dictionary<string, List<double>>() { { dictitr.Key, dictitr.Value } };
-                Stopwatch swh = Stopwatch.StartNew();
-                MultiSequenceLearning experiment = new MultiSequenceLearning();
-                var predictor = experiment.Run(usefuldict);
-                swh.Stop();
-                Console.WriteLine("Elapsed time for {0}: {1} ms", dictitr.Key, swh.ElapsedMilliseconds);
-            }
-
-
-        }*/
-
+        
         private static void PredictNextElement(Predictor predictor, double[] list)
         {
             Debug.WriteLine("------------------------------");
