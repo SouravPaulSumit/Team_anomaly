@@ -3,10 +3,7 @@ using NeoCortexApi.Classifiers;
 using NeoCortexApi.Encoders;
 using NeoCortexApi.Entities;
 using NeoCortexApi.Network;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 
 namespace NeoCortexApiSample
@@ -19,13 +16,12 @@ namespace NeoCortexApiSample
         /// <summary>
         /// Runs the learning of sequences.
         /// </summary>
-        /// <param name="sequences">Dictionary of sequences. KEY is the sewuence name, the VALUE is th elist of element of the sequence.</param>
+        /// <param name="sequences">Dictionary of sequences. KEY is the sequence name, the VALUE is the list of element of the sequence.</param>
         public Predictor Run(Dictionary<string, List<double>> sequences)
         {
-            Console.WriteLine($"Hello NeocortexApi! Experiment {nameof(MultiSequenceLearning)}");
 
             int inputBits = 100;
-            int numColumns = 1024;
+            int numColumns = 2048;
 
             HtmConfig cfg = new HtmConfig(new int[] { inputBits }, new int[] { numColumns })
             {
@@ -54,7 +50,7 @@ namespace NeoCortexApiSample
                 PredictedSegmentDecrement = 0.1
             };
 
-            double max = 20;
+            double max = 100;
 
             Dictionary<string, object> settings = new Dictionary<string, object>()
             {
@@ -74,7 +70,7 @@ namespace NeoCortexApiSample
         }
 
         /// <summary>
-        ///
+        /// Multisequence learning experiment started
         /// </summary>
         private Predictor RunExperiment(int inputBits, HtmConfig cfg, EncoderBase encoder, Dictionary<string, List<double>> sequences)
         {
@@ -133,7 +129,7 @@ namespace NeoCortexApiSample
 
             var lastPredictedValues = new List<string>(new string[] { "0" });
 
-            int maxCycles = 15;
+            int maxCycles = 3500;
 
             //
             // Training SP to get stable. New-born stage.
@@ -165,7 +161,7 @@ namespace NeoCortexApiSample
             }
 
             // Clear all learned patterns in the classifier.
-            //cls.ClearState();
+            cls.ClearState();
 
             // We activate here the Temporal Memory algorithm.
             layer1.HtmModules.Add("tm", tm);
@@ -269,6 +265,7 @@ namespace NeoCortexApiSample
                     double accuracy = (double)matches / (double)sequenceKeyPair.Value.Count * 100.0;
 
                     Debug.WriteLine($"Cycle: {cycle}\tMatches={matches} of {sequenceKeyPair.Value.Count}\t {accuracy}%");
+
 
                     if (accuracy >= maxPossibleAccuraccy)
                     {
