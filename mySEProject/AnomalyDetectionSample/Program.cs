@@ -11,35 +11,56 @@ using System.Collections;
 
 namespace NeoCortexApiSample
 {
-    
+    /// <summary>
+    /// Reads a single CSV file and returns its contents as a list of sequences.
+    /// </summary>
     public class CSVFileReader
     {
-        private string _filePathToCSV;        
+        private string _filePathToCSV;
+
+        /// <summary>
+        /// Creates a new instance of the CSVFileReader class with the provided file path to the constructor.
+        /// </summary>
+        /// <param name="filePathToCSV">The path to the CSV file to be read.</param>
         public CSVFileReader(string filePathToCSV)
         {
             _filePathToCSV = filePathToCSV;
         }
-        
+
+        /// <summary>
+        /// Reads the CSV file at the file path specified in the constructor,
+        /// and returns its contents as a list of sequences.
+        /// </summary>
+        /// <returns>A list of sequences contained in the CSV file.</returns>
         public List<List<double>> ReadFile()
         {
             List<List<double>> sequences = new List<List<double>>();
-            string[] csvLines = File.ReadAllLines(_filePathToCSV);           
+            string[] csvLines = File.ReadAllLines(_filePathToCSV);
+            // Loop through each line in the CSV File
             for (int i = 0; i < csvLines.Length; i++)
-            {                
+            {
+                // Current line is split into an array of columns
                 string[] columns = csvLines[i].Split(new char[] { ',' });
                 List<double> sequence = new List<double>();
+                // Loop through each column in the current line
                 for (int j = 0; j < columns.Length; j++)
-                {                   
+                {
+                    // Parsing the current column as double,then adding it to the current sequence
                     sequence.Add(double.Parse(columns[j]));
                 }
                 sequences.Add(sequence);
             }
             return sequences;
         }
-        
+
+        /// <summary>
+        /// This method reads the CSV file at the file path passed on to the constructor,
+        /// and outputs its contents to the console.
+        /// </summary>
         public void CSVSequencesConsoleOutput()
         {
-            List<List<double>> sequences = ReadFile();            
+            List<List<double>> sequences = ReadFile();
+            // Looping through each sequence and displaying it in the console
             for (int i = 0; i < sequences.Count; i++)
             {
                 Console.Write("Sequence " + (i + 1) + ": ");
@@ -51,15 +72,28 @@ namespace NeoCortexApiSample
             }
         }
     }
-    
+
+    /// <summary>
+    /// Reads the CSV files inside a folder and returns its contents as a list of sequences.
+    /// </summary>
     public class CSVFolderReader
     {
-        private string _folderPathToCSV;        
+        private string _folderPathToCSV;
+
+        /// <summary>
+        /// Creates a new instance of the CSVFolderReader class with the provided file path to the constructor.
+        /// </summary>
+        /// <param name="folderPathToCSV">The path to the folder containing the CSV files.</param>
         public CSVFolderReader(string folderPathToCSV)
         {
             _folderPathToCSV = folderPathToCSV;
         }
-        
+
+        /// <summary>
+        /// Reads all CSV files in the folder, path to the folder is specified in the constructor,
+        /// and returns its contents as a list of sequences.
+        /// </summary>
+        /// <returns>A list of sequences contained in the CSV files present in the folder.</returns>
         public List<List<double>> ReadFolder()
         {
             List<List<double>> folderSequences = new List<List<double>>();
@@ -83,10 +117,14 @@ namespace NeoCortexApiSample
             return folderSequences;
         }
 
-        
+        /// <summary>
+        /// This method reads all CSV files in the folder path passed on to the constructor,
+        /// and outputs its contents to the console.
+        /// </summary>
         public void CSVSequencesConsoleOutput()
         {
-            List<List<double>> sequences = ReadFolder();            
+            List<List<double>> sequences = ReadFolder();
+            // Looping through each sequence and displaying it in the console
             for (int i = 0; i < sequences.Count; i++)
             {
                 Console.Write("Sequence " + (i + 1) + ": ");
@@ -99,10 +137,17 @@ namespace NeoCortexApiSample
         }
     }
 
-    
+    /// <summary>
+    /// Converts a list of sequences to a dictionary of sequences for facilitating HTM Engine training.
+    /// </summary>
     public class CSVToHTMInput
     {
-        
+        /// <summary>
+        /// Builds a dictionary of sequences from a list of sequences.
+        /// An unique key is added, which is later used as an input for HtmClassifier.
+        /// </summary>
+        /// <param name="sequences">A list of sequences read from CSV files/files in a folder.</param>
+        /// <returns>A dictionary of sequences required for HTM Engine training.</returns>
         public Dictionary<string, List<double>> BuildHTMInput(List<List<double>> sequences)
         {
             Dictionary<string, List<double>> dictionary = new Dictionary<string, List<double>>();
@@ -123,7 +168,11 @@ namespace NeoCortexApiSample
     /// </summary>
     public class HTMModeltraining
     {
-        
+        /// <summary>
+        /// Runs the HTM model learning experiment on a folder containing CSV files, and returns the trained model.
+        /// </summary>
+        /// <param name="folderPath">The path to the folder containing the CSV files to be used for training the model.</param>
+        /// <param name="predictor">The trained model that will be used for prediction.</param>
         public void RunHTMModelLearning(string folderPath, out Predictor predictor)
         {
             Console.WriteLine("------------------------------");
