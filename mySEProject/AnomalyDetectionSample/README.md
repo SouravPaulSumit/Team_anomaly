@@ -29,7 +29,111 @@ To run this project,
 
 * Install .NET SDK. Then using code editor/IDE of your choice, create a new console project and place all the C# codes inside your project folder. 
 * Add/reference nuget package NeoCortexApi v1.1.4 to this project.
-* Place training and testing datasets under training and testing folder respectively.
+* Place training and testing datasets under training and testing folder respectively. Both the folders should be inside the project folder.
 
-To run this project using github codespaces, set up .NET and Nuget manager in your environment. Place the training and testing folders in your project folder. The path to training and testing should be modified accordingly.
+Our project is based on NeoCortex API. More details [here](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/gettingStarted.md).
+
+# Details
+
+We have used [MultiSequenceLearning](https://github.com/ddobric/neocortexapi/blob/master/source/Samples/NeoCortexApiSample/MultisequenceLearning.cs) as the base of this project.
+
+For this project, we are using time series of network load (rounded off to nearest integer, in precentage) as our training data. The data is kept inside the csv files in the following format:
+
+```
+49,52,55,48,52,47,46,50,52,47
+49,52,55,48,52,47,46,50,49,47
+.............................
+.............................
+48,54,55,48,52,47,46,50,49,45
+51,54,55,48,52,47,46,50,49,45
+```
+
+## Encoding:
+
+Encoding of this data is very important. More on [this](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/Encoders.md).
+
+As we are going to train and test data between the range of integer values between 0-100 with no periodicity, we are using the following settings.
+
+```csharp
+
+int inputBits = 121;
+int numColumns = 1210;
+.......................
+.......................
+double max = 100;
+
+Dictionary<string, object> settings = new Dictionary<string, object>()
+            {
+                { "W", 21},
+                ...........
+                { "MinVal", 0.0},
+                ...........
+                { "MaxVal", max}
+            };
+ ```
+ 
+ Complete settings:
+ 
+ ```csharp
+
+Dictionary<string, object> settings = new Dictionary<string, object>()
+            {
+                { "W", 21},
+                { "N", inputBits},
+                { "Radius", -1.0},
+                { "MinVal", 0.0},
+                { "Periodic", false},
+                { "Name", "integer"},
+                { "ClipInput", false},
+                { "MaxVal", max}
+            };
+```
+
+## HTM Config:
+
+We have used the following config. More on [this](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/SpatialPooler.md#parameter-desription).
+
+```csharp
+{
+                Random = new ThreadSafeRandom(42),
+
+                CellsPerColumn = 25,
+                GlobalInhibition = true,
+                LocalAreaDensity = -1,
+                NumActiveColumnsPerInhArea = 0.02 * numColumns,
+                PotentialRadius = (int)(0.15 * inputBits),
+                //InhibitionRadius = 15,
+
+                MaxBoost = 10.0,
+                DutyCyclePeriod = 25,
+                MinPctOverlapDutyCycles = 0.75,
+                MaxSynapsesPerSegment = (int)(0.02 * numColumns),
+
+                ActivationThreshold = 15,
+                ConnectedPermanence = 0.5,
+
+                // Learning is slower than forgetting in this case.
+                PermanenceDecrement = 0.25,
+                PermanenceIncrement = 0.15,
+
+                // Used by punishing of segments.
+                PredictedSegmentDecrement = 0.1
+};
+```
+
+
+## How multisequence learning works?
+
+```
+1. 
+2.
+```
+
+## How prediction works?
+
+
+# Results
+
+# Scope of improvement
+
 
