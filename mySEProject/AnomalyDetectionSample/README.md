@@ -37,7 +37,7 @@ Our project is based on NeoCortex API. More details [here](https://github.com/dd
 
 We have used [MultiSequenceLearning](https://github.com/ddobric/neocortexapi/blob/master/source/Samples/NeoCortexApiSample/MultisequenceLearning.cs) as the base of this project.
 
-For this project, we are using time series of network load (rounded off to nearest integer, in precentage) as our training data. The data is kept inside the csv files in the following format:
+For this project, we are using a sample time series data of network load (rounded off to nearest integer, in precentage) for training. The data is kept inside the csv files in the following format:
 
 ```
 49,52,55,48,52,47,46,50,52,47
@@ -47,12 +47,31 @@ For this project, we are using time series of network load (rounded off to neare
 48,54,55,48,52,47,46,50,49,45
 51,54,55,48,52,47,46,50,49,45
 ```
+Plotting the graph of the sequences from our training data, we get the following. Normally, the values stay within the range of 45 to 55. 
+
+![alt text](https://github.com/SouravPaulSumit/Team_anomaly/blob/Sourav_Paul_Sumit/mySEProject/AnomalyDetectionSample/output/training_data_plot.jpg)
+
+For testing our project, we have taken parts of sequences of our training data, and added anomalies to this data for predicting and testing.
+```
+55,48,52,47,46,99,52,47
+52,55,48,52,47,46,90,49,97
+......................
+......................
+55,48,52,47,16,50,49,45
+97,46,50,49,75
+```
+
+Plot of this data is given below. Marked red values indicate the anomalies in the testing data.
+
+![alt text](https://github.com/SouravPaulSumit/Team_anomaly/blob/Sourav_Paul_Sumit/mySEProject/AnomalyDetectionSample/output/testing_data_plot.jpg)
 
 ## Encoding:
 
 Encoding of this data is very important. More on [this](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/Encoders.md).
 
 As we are going to train and test data between the range of integer values between 0-100 with no periodicity, we are using the following settings.
+
+Minimum and maximum values are set to 0 and 100 respectively.
 
 ```csharp
 
