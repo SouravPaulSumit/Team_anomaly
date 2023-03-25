@@ -188,3 +188,16 @@ return new Predictor(layer1, mem, cls)
 .....
 `````
 We will use this for prediction.
+
+## Results
+
+After running this project, we got the following [output](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/raw_output.txt).
+
+Detailed analysis of this output can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/analysis.txt).
+
+Average results of our experiment are:
+
+```
+Average False Negative rate(FNR) of this experiment: 0.35
+Average False Positive rate(FPR) of this experiment: 0.13
+```
