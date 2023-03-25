@@ -316,23 +316,28 @@ namespace NeoCortexApiSample
                 var firstanomalyScore = Math.Abs(predictedFirstItem - firstItem);
                 var fdeviation = firstanomalyScore / firstItem;
 
-                if (fdeviation > tolerance)
+                if (fdeviation <= tolerance)
                 {
+
+                    Console.WriteLine("No anomaly detected in the first element. Starting check from beginning of the list.");
+                    startFromFirst = true;
+
+                }
+                else
+                {
+
                     Console.WriteLine($"****Anomaly detected**** in the first element. HTM Engine predicted it to be {predictedFirstItem} with similarity: {stokens3}%, but the actual value is {firstItem}.");
                     Console.WriteLine("Moving to the next element.");
                     startFromFirst = false;
 
                 }
-                else
-                {
-                    Console.WriteLine("No anomaly detected in the first element. Starting check from beginning of the list.");
-                    startFromFirst = true;
-                }
             }
             else
             {
+
                 Console.WriteLine("Anomaly detection cannot be performed for the first element. Starting check from beginning of the list.");
                 startFromFirst = true;
+
             }
 
             //Ending check for anomaly in the first element
