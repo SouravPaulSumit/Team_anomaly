@@ -228,6 +228,10 @@ namespace NeoCortexApiSample
             _trainingFolderPath = Path.Combine(projectbaseDirectory, trainingFolderPath);
             _testingFolderPath = Path.Combine(projectbaseDirectory, testingFolderPath);
 
+            //Use the bottom path variables if you want to override to specify path on your own
+            //_trainingFolderPath = "";
+            //_testingFolderPath = "";
+
         }
 
         /// <summary>
@@ -284,8 +288,66 @@ namespace NeoCortexApiSample
             //Tolerance level set to 10%.
             double tolerance = 0.1;
 
-            //Input list will be traversed one by one, like a sliding window 
-            for (int i = 0; i < list.Length; i++)
+            //In the beginning, we are going to check whether's anomaly in the first element of the list
+            //For that, we are going to input second item from the list and predict previous item using our trained HTM model
+            //Then we will compare the first item of the list with the predicted previous item of the second item, i.e predicted first item 
+
+
+            //Boolean flag is used to check whether we can start checking from first element or not.
+            //We will not start checking from first element if there is anomaly in the first element.
+            bool startFromFirst = true;
+
+            double firstItem = list[0];
+            double secondItem = list[1];
+
+            //Checking the first element of the list for anomaly
+            //Using our trained HTM model predictor to predict previous item
+            var secondItemRes = predictor.Predict(secondItem);
+            Console.WriteLine("First element in the testing sequence from input list: " + firstItem);
+
+            if (secondItemRes.Count > 0)
+            {
+                //Extracting predicted item and accuracy from predictor output 
+                var stokens = secondItemRes.First().PredictedInput.Split('_');
+                var stokens2 = secondItemRes.First().PredictedInput.Split('-');
+                var stokens3 = secondItemRes.First().Similarity;
+                var stokens4 = stokens2.Reverse().ElementAt(2);
+                double predictedFirstItem = double.Parse(stokens4);
+                var firstanomalyScore = Math.Abs(predictedFirstItem - firstItem);
+                var fdeviation = firstanomalyScore / firstItem;
+
+                if (fdeviation > tolerance)
+                {
+                    Console.WriteLine($"****Anomaly detected**** in the first element. HTM Engine predicted it to be {predictedFirstItem} with similarity: {stokens3}%, but the actual value is {firstItem}.");
+                    Console.WriteLine("Moving to the next element.");
+                    startFromFirst = false;
+
+                }
+                else
+                {
+                    Console.WriteLine("No anomaly detected in the first element. Starting check from beginning of the list.");
+                    startFromFirst = true;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Anomaly detection cannot be performed for the first element. Starting check from beginning of the list.");
+                startFromFirst = true;
+            }
+
+            //Ending check for anomaly in the first element
+            //The above few lines of code is only used to check whether is anomaly in the first element only
+            //which is missed when we use sliding window approach.
+            //We use a checking condition to set the starting point depending on
+            //whether there's anomaly in first element or not.
+            //Ternary operator checks the flag and sets the starting point accordingly
+            //If "startFromFirst" flag is true, checkCondition is set to 0, otherwise it is set to 1. 
+
+            int checkCondition = startFromFirst ? 0 : 1;
+
+            //Starting element depends on whether there is anomaly in first element or not
+            //Input list will be traversed one by one, like a sliding window
+            for (int i = checkCondition; i < list.Length; i++)
             {
                 var item = list[i];
 
@@ -295,6 +357,7 @@ namespace NeoCortexApiSample
 
                 if (res.Count > 0)
                 {
+                    //Extracting predicted item and accuracy from predictor output
                     var tokens = res.First().PredictedInput.Split('_');
                     var tokens2 = res.First().PredictedInput.Split('-');
                     var tokens3 = res.First().Similarity;
@@ -315,7 +378,7 @@ namespace NeoCortexApiSample
                         else
                         {
                             Console.WriteLine($"****Anomaly detected**** in the next element. HTM Engine predicted it to be {predictedNextItem} with similarity: {tokens3}%, but the actual value is {nextItem}.");
-                            i++; // skip to the next element for checking
+                            i++; // skip to the next element for checking, as we cannot use anomalous element for prediction
                             Console.WriteLine("As anomaly was detected, so we are skipping to the next element in our testing sequence.");
                         }
                     }
