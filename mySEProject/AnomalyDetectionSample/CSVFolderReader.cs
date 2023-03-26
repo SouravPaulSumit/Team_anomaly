@@ -37,7 +37,14 @@ namespace AnomalyDetectionSample
                     List<double> sequence = new List<double>();
                     for (int j = 0; j < columns.Length; j++)
                     {
-                        sequence.Add(double.Parse(columns[j]));
+                        if (double.TryParse(columns[j], out double value))
+                        {
+                            sequence.Add(value);
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Non-numeric value found! Please check file: {fileName}.");
+                        }
                     }
                     sequencesInFile.Add(sequence);
                 }
