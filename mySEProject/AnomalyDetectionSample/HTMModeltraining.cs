@@ -24,23 +24,24 @@ namespace AnomalyDetectionSample
             Console.WriteLine("------------------------------");
             Console.WriteLine();
             Console.WriteLine("HTM Model training initiated...................");
-            //Using stopwatch to calculate the total training time
+            // Using stopwatch to calculate the total training time
             Stopwatch swh = Stopwatch.StartNew();
 
-            //Read sequences from CSV files in the specified folder
-            //CSVFileReader class can also be used for single files
+            // Read sequences from CSV files in the specified folder
+            // CSVFileReader class can also be used for single files
             CSVFolderReader reader = new CSVFolderReader(folderPath);
             var sequences = reader.ReadFolder();
 
-            //Convert sequences to HTM input format
+            // Convert sequences to HTM input format
             CSVToHTMInput converter = new CSVToHTMInput();
             var htmInput = converter.BuildHTMInput(sequences);
 
-            //Starting multi-sequence learning experiment to generate predictor model
-            //by passing htmInput 
+            // Starting multi-sequence learning experiment to generate predictor model
+            // by passing htmInput 
             MultiSequenceLearning learning = new MultiSequenceLearning();
             predictor = learning.Run(htmInput);
-            //Our HTM model training concludes here
+
+            // Our HTM model training concludes here
 
             swh.Stop();
 

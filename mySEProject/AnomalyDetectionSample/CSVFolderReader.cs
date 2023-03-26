@@ -26,17 +26,27 @@ namespace AnomalyDetectionSample
         public List<List<double>> ReadFolder()
         {
             List<List<double>> folderSequences = new List<List<double>>();
+
+            // All the CSV files present inside the folder are taken
             string[] fileEntries = Directory.GetFiles(_folderPathToCSV, "*.csv");
+
+            // Iterating through each CSV file inside the folder
             foreach (string fileName in fileEntries)
             {
                 string[] csvLines = File.ReadAllLines(fileName);
                 List<List<double>> sequencesInFile = new List<List<double>>();
+
+                // Looping through each line in the current CSV file
                 for (int i = 0; i < csvLines.Length; i++)
                 {
                     string[] columns = csvLines[i].Split(new char[] { ',' });
                     List<double> sequence = new List<double>();
+
+                    // Loop through each column in the current line
                     for (int j = 0; j < columns.Length; j++)
                     {
+                        // Value of column is parsed as double and added to sequence
+                        // if it fails then exception is thrown
                         if (double.TryParse(columns[j], out double value))
                         {
                             sequence.Add(value);

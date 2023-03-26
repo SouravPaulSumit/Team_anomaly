@@ -24,14 +24,14 @@ namespace AnomalyDetectionSample
         ///<param name="testingFolderPath">The path to the folder containing the CSV files for testing.</param>
         public HTMAnomalyTesting(string trainingFolderPath = "training", string testingFolderPath = "testing")
         {
-            //Folder directory set to location of C# files. This is the relative path.
+            // Folder directory set to location of C# files. This is the relative path.
             string projectbaseDirectory = Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.Parent!.FullName;
             _trainingFolderPath = Path.Combine(projectbaseDirectory, trainingFolderPath);
             _testingFolderPath = Path.Combine(projectbaseDirectory, testingFolderPath);
 
-            //Use the bottom path variables if you want to override to specify path on your own
-            //_trainingFolderPath = "";
-            //_testingFolderPath = "";
+            // Use the bottom path variables if you want to override to specify path on your own
+            // _trainingFolderPath = "";
+            // _testingFolderPath = "";
 
         }
 
@@ -40,7 +40,7 @@ namespace AnomalyDetectionSample
         /// </summary>
         public void Run()
         {
-            //HTM model training initiated
+            // HTM model training initiated
             HTMModeltraining myModel = new HTMModeltraining();
             Predictor myPredictor;
 
@@ -51,16 +51,16 @@ namespace AnomalyDetectionSample
             Console.WriteLine("Started testing our trained HTM Engine...................");
             Console.WriteLine();
 
-            //CSVFileReader can also be used to read a single file
-            //Starting to test our trained HTM model
+            // CSVFileReader can also be used to read a single file
+            // Starting to test our trained HTM model
             CSVFolderReader testseq = new CSVFolderReader(_testingFolderPath);
             var inputtestseq = testseq.ReadFolder();
             myPredictor.Reset();
 
-            //Testing the sequences one by one
-            //Our anomaly detection experiment is complete after all the lists are traversed iteratively.
-            //If the list contains less than two values, or contain non-negative values, exception is thrown from DetectAnomaly method.
-            //Errors are handled using exception handling without disrupting our program flow.
+            // Testing the sequences one by one
+            // Our anomaly detection experiment is complete after all the lists are traversed iteratively.
+            // If the list contains less than two values, or contain non-negative values, exception is thrown from DetectAnomaly method.
+            // Errors are handled using exception handling without disrupting our program flow.
             foreach (List<double> list in inputtestseq)
             {
                 double[] lst = list.ToArray();
@@ -83,7 +83,7 @@ namespace AnomalyDetectionSample
         }
 
         /// <summary>
-        /// Predicts anomalies in the input list using the HTM trained model.
+        /// Detects anomalies in the input list using the HTM trained model.
         /// The anomaly score is calculated using a sliding window approach.
         /// The difference between the predicted value and the actual value is used to calculate the anomaly score.
         /// If the difference exceeds a certain tolerance set earlier, anomaly is detected.
@@ -92,13 +92,13 @@ namespace AnomalyDetectionSample
         /// <param name="list">Input list which will be used to detect anomalies.</param>
         private static void DetectAnomaly(Predictor predictor, double[] list)
         {
-            //Checking if the list contains at least two values
+            // Checking if the list contains at least two values
             if (list.Length < 2)
             {
                 throw new ArgumentException($"List must contain at least two values. Actual count: {list.Length}. List: [{string.Join(",", list)}]");
 
             }
-            //Checking if the list contains any non-numeric values
+            // Checking if the list contains any non-numeric values
             foreach (double value in list)
             {
                 if (double.IsNaN(value))
@@ -111,51 +111,53 @@ namespace AnomalyDetectionSample
             Console.WriteLine();
             Console.WriteLine("Testing the sequence for anomaly detection: " + string.Join(", ", list) + ".");
 
-            //Tolerance level set to 10%.
+            // Tolerance level set to 10%.
             double tolerance = 0.1;
 
-            //In the beginning, we are going to check whether's anomaly in the first element of the list
-            //For that, we are going to input second item from the list and predict previous item using our trained HTM model
-            //Then we will compare the first item of the list with the predicted previous item of the second item, i.e predicted first item 
+            // In the beginning, we are going to check whether's anomaly in the first element of the list.
+            // For that, we are going to input second item from the list and predict previous item using our trained HTM model.
+            // After that, we will compare the first item of the list with the predicted previous item of the second item, i.e predicted first item. 
 
 
-            //Boolean flag is used to check whether we can start checking from first element or not.
-            //We will not start checking from first element if there is anomaly in the first element.
+            // Boolean flag is used to check whether we can start checking from first element or not.
+            // We will not start checking from first element if there is anomaly in the first element.
             bool startFromFirst = true;
 
-            //These are the first and second items from the input list.
-            //These values are neccesary to detect anomaly in the first element of the list.
+            // These are the first and second items from the input list.
+            // These values are neccesary to detect anomaly in the first element of the list.
             double firstItem = list[0];
             double secondItem = list[1];
 
-            //Checking the first element of the list for anomaly
-            //Using our trained HTM model predictor to predict previous item
+            // Checking the first element of the list for anomaly
+            // Using our trained HTM model predictor to predict the first item.
             var secondItemRes = predictor.Predict(secondItem);
+
             Console.WriteLine("First element in the testing sequence from input list: " + firstItem);
 
             if (secondItemRes.Count > 0)
             {
-                //Extracting predicted item and accuracy from predictor output 
+                // Extracting predicted item and accuracy from predictor output
+                // Refer to documentation to know about how this works.
                 var stokens = secondItemRes.First().PredictedInput.Split('_');
                 var stokens2 = secondItemRes.First().PredictedInput.Split('-');
                 var stokens3 = secondItemRes.First().Similarity;
                 var stokens4 = stokens2.Reverse().ElementAt(2);
                 double predictedFirstItem = double.Parse(stokens4);
+                // firstanomalyScore variable will be used to check the deviation for first element in the list only
                 var firstanomalyScore = Math.Abs(predictedFirstItem - firstItem);
                 var fdeviation = firstanomalyScore / firstItem;
 
                 if (fdeviation <= tolerance)
                 {
 
-                    Console.WriteLine("No anomaly detected in the first element. Starting check from beginning of the list.");
+                    Console.WriteLine($"No anomaly detected in the first element. HTM Engine found similarity to be:{stokens3}%. Starting check from beginning of the list.");
                     startFromFirst = true;
 
                 }
                 else
                 {
 
-                    Console.WriteLine($"****Anomaly detected**** in the first element. HTM Engine predicted it to be {predictedFirstItem} with similarity: {stokens3}%, but the actual value is {firstItem}.");
-                    Console.WriteLine("Moving to the next element.");
+                    Console.WriteLine($"****Anomaly detected**** in the first element. HTM Engine predicted it to be {predictedFirstItem} with similarity: {stokens3}%, but the actual value is {firstItem}. Moving to the next element.");
                     startFromFirst = false;
 
                 }
@@ -168,39 +170,43 @@ namespace AnomalyDetectionSample
 
             }
 
-            //Ending check for anomaly in the first element
-            //The above few lines of code is only used to check whether is anomaly in the first element only
-            //which is missed when we use sliding window approach.
-            //We use a checking condition to set the starting point depending on
-            //whether there's anomaly in first element or not.
-            //Ternary operator checks the flag and sets the starting point accordingly
-            //If "startFromFirst" flag is true, checkCondition is set to 0, otherwise it is set to 1. 
+            // Ending check for anomaly in the first element
+            // The above few lines of code is only used to detect whether anomaly is present in the first element only
+            // which is missed when we use sliding window approach.
+            // We use a checking condition to set the starting point depending on
+            // whether there's anomaly in first element or not.
+            // Ternary operator checks the flag and sets the starting point accordingly
+            // If "startFromFirst" flag is true, checkCondition is set to 0, otherwise it is set to 1. 
 
             int checkCondition = startFromFirst ? 0 : 1;
 
-            //Starting element depends on whether there is anomaly in first element or not
-            //Input list will be traversed one by one, like a sliding window
+            // Starting element depends on whether there is anomaly in first element or not
+            // Input list will be traversed one by one, like a sliding window
             for (int i = checkCondition; i < list.Length; i++)
             {
+                //Values for the rest of the list will be iteratively referred to, in the following variable.
                 var item = list[i];
 
-                //Using our trained HTM model predictor to predict next item.
+                // Using our trained HTM model predictor to predict next item.
                 var res = predictor.Predict(item);
                 Console.WriteLine("Current element in the testing sequence from input list: " + item);
 
                 if (res.Count > 0)
                 {
-                    //Extracting predicted item and accuracy from predictor output
+                    // Extracting predicted item and accuracy from predictor output
+                    // Refer to documentation to know about how this works.
                     var tokens = res.First().PredictedInput.Split('_');
                     var tokens2 = res.First().PredictedInput.Split('-');
                     var tokens3 = res.First().Similarity;
 
-                    if (i < list.Length - 1) // excluding the last element of the list
+                    // We exclude the last element of the list
+                    // Because there is no element after that to detect anomaly in.
+                    if (i < list.Length - 1)
                     {
                         int nextIndex = i + 1;
                         double nextItem = list[nextIndex];
                         double predictedNextItem = double.Parse(tokens2.Last());
-                        //Anomalyscore variable will be used to check the deviation from predicted item
+                        // Anomalyscore variable will be used to check the deviation from predicted item
                         var AnomalyScore = Math.Abs(predictedNextItem - nextItem);
                         var deviation = AnomalyScore / nextItem;
 

@@ -36,6 +36,8 @@ namespace AnomalyDetectionSample
                 // Loop through each column in the current line
                 for (int j = 0; j < columns.Length; j++)
                 {
+                    // Value of column is parsed as double and added to sequence
+                    // if it fails then exception is thrown
                     if (double.TryParse(columns[j], out double value))
                     {
                         sequence.Add(value);
