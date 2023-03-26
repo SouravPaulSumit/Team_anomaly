@@ -108,9 +108,9 @@ Dictionary<string, object> settings = new Dictionary<string, object>()
             };
 ```
 
-## HTM Config:
+## HTM Configuration:
 
-We have used the following config. More on [this](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/SpatialPooler.md#parameter-desription).
+We have used the following configuration. More on [this](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/SpatialPooler.md#parameter-desription)
 
 ```csharp
 {
@@ -141,18 +141,63 @@ We have used the following config. More on [this](https://github.com/ddobric/neo
 ```
 
 
-## How multisequence learning works?
+## Multisequence learning
+
+The [RunExperiment](https://github.com/SouravPaulSumit/Team_anomaly/blob/be27813af65f611df7cbd33009d72a3ee72e3756/mySEProject/AnomalyDetectionSample/multisequencelearning.cs#L75) method inside the [multisequencelearning](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/multisequencelearning.cs) class file demonstrates how multisequence learning works. To summarize, 
+
+* HTM Configuration is taken and memory of connections are initialized. After that, HTM Classifier, Cortex layer and HomeostaticPlasticityController are initialized.
+```csharp
+.......
+var mem = new Connections(cfg);
+.......
+HtmClassifier<string, ComputeCycle> cls = new HtmClassifier<string, ComputeCycle>();
+CortexLayer<object, object> layer1 = new CortexLayer<object, object>("L1");
+HomeostaticPlasticityController hpc = new HomeostaticPlasticityController(mem, numUniqueInputs * 150, (isStable, numPatterns, actColAvg, seenInputs) => ..
+.......
+.......
+```
+
+* After that, Spatial Pooler and Temporal Memory is initialized.
+```csharp
+.....
+TemporalMemory tm = new TemporalMemory();
+SpatialPoolerMT sp = new SpatialPoolerMT(hpc);
+.....
+```
+* After that, spatial pooler memory is added to cortex layer and trained for maximum number of cycles.
+```csharp
+.....
+layer1.HtmModules.Add("sp", sp);
+int maxCycles = 3500;
+for (int i = 0; i < maxCycles && isInStableState == false; i++)
+.....
+`````
+* After that, temporal memory is added to cortex layer to learn all the input sequences.
+```csharp
+.....
+layer1.HtmModules.Add("tm", tm);
+foreach (var sequenceKeyPair in sequences){
+.....
+}
+.....
+```
+* Finally, the trained cortex layer and HTM classifier is returned.
+```csharp
+.....
+return new Predictor(layer1, mem, cls)
+.....
+`````
+We will use this for prediction.
+
+## Results
+
+After running this project, we got the following [output](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/raw_output.txt).
+
+Detailed analysis of this output can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/analysis.txt).
+
+Average results of our experiment are:
 
 ```
-1. 
-2.
+Average False Negative rate(FNR) of this experiment: 0.35
+Average False Positive rate(FPR) of this experiment: 0.13
 ```
-
-## How prediction works?
-
-
-# Results
-
-# Scope of improvement
-
-

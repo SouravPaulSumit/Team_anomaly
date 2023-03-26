@@ -20,8 +20,8 @@ namespace NeoCortexApiSample
         public Predictor Run(Dictionary<string, List<double>> sequences)
         {
 
-            int inputBits = 100;
-            int numColumns = 2048;
+            int inputBits = 121;
+            int numColumns = 1210;
 
             HtmConfig cfg = new HtmConfig(new int[] { inputBits }, new int[] { numColumns })
             {
@@ -54,12 +54,12 @@ namespace NeoCortexApiSample
 
             Dictionary<string, object> settings = new Dictionary<string, object>()
             {
-                { "W", 15},
+                { "W", 21},
                 { "N", inputBits},
                 { "Radius", -1.0},
                 { "MinVal", 0.0},
                 { "Periodic", false},
-                { "Name", "scalar"},
+                { "Name", "integer"},
                 { "ClipInput", false},
                 { "MaxVal", max}
             };
