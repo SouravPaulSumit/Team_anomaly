@@ -1,4 +1,6 @@
-﻿namespace NeoCortexApiSample
+﻿using System;
+
+namespace AnomalyDetectionSample
 {
 
     class Program
@@ -7,7 +9,7 @@
         {
             // Starts experiment that demonstrates how to perform anomaly detection using multisequencelearning.
             HTMAnomalyTesting tester = new HTMAnomalyTesting();
-            tester.AnomalyTestRun();
+            tester.Run();
 
         }
 

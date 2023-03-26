@@ -1,213 +1,14 @@
 ﻿using NeoCortexApi;
-using System.Diagnostics;
+using System;
 
-namespace NeoCortexApiSample
+namespace AnomalyDetectionSample
 {
-    /// <summary>
-    /// Reads a single CSV file and returns its contents as a list of sequences.
-    /// </summary>
-    public class CSVFileReader
-    {
-        private string _filePathToCSV;
-
-        /// <summary>
-        /// Creates a new instance of the CSVFileReader class with the provided file path to the constructor.
-        /// </summary>
-        /// <param name="filePathToCSV">The path to the CSV file to be read.</param>
-        public CSVFileReader(string filePathToCSV)
-        {
-            _filePathToCSV = filePathToCSV;
-        }
-
-        /// <summary>
-        /// Reads the CSV file at the file path specified in the constructor,
-        /// and returns its contents as a list of sequences.
-        /// </summary>
-        /// <returns>A list of sequences contained in the CSV file.</returns>
-        public List<List<double>> ReadFile()
-        {
-            List<List<double>> sequences = new List<List<double>>();
-            string[] csvLines = File.ReadAllLines(_filePathToCSV);
-            // Loop through each line in the CSV File
-            for (int i = 0; i < csvLines.Length; i++)
-            {
-                // Current line is split into an array of columns
-                string[] columns = csvLines[i].Split(new char[] { ',' });
-                List<double> sequence = new List<double>();
-                // Loop through each column in the current line
-                for (int j = 0; j < columns.Length; j++)
-                {
-                    // Parsing the current column as double,then adding it to the current sequence
-                    sequence.Add(double.Parse(columns[j]));
-                }
-                sequences.Add(sequence);
-            }
-            return sequences;
-        }
-
-        /// <summary>
-        /// This method reads the CSV file at the file path passed on to the constructor,
-        /// and outputs its contents to the console.
-        /// </summary>
-        public void CSVSequencesConsoleOutput()
-        {
-            List<List<double>> sequences = ReadFile();
-            // Looping through each sequence and displaying it in the console
-            for (int i = 0; i < sequences.Count; i++)
-            {
-                Console.Write("Sequence " + (i + 1) + ": ");
-                foreach (double number in sequences[i])
-                {
-                    Console.Write(number + " ");
-                }
-                Console.WriteLine("");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Reads the CSV files inside a folder and returns its contents as a list of sequences.
-    /// </summary>
-    public class CSVFolderReader
-    {
-        private string _folderPathToCSV;
-
-        /// <summary>
-        /// Creates a new instance of the CSVFolderReader class with the provided file path to the constructor.
-        /// </summary>
-        /// <param name="folderPathToCSV">The path to the folder containing the CSV files.</param>
-        public CSVFolderReader(string folderPathToCSV)
-        {
-            _folderPathToCSV = folderPathToCSV;
-        }
-
-        /// <summary>
-        /// Reads all CSV files in the folder, path to the folder is specified in the constructor,
-        /// and returns its contents as a list of sequences.
-        /// </summary>
-        /// <returns>A list of sequences contained in the CSV files present in the folder.</returns>
-        public List<List<double>> ReadFolder()
-        {
-            List<List<double>> folderSequences = new List<List<double>>();
-            string[] fileEntries = Directory.GetFiles(_folderPathToCSV, "*.csv");
-            foreach (string fileName in fileEntries)
-            {
-                string[] csvLines = File.ReadAllLines(fileName);
-                List<List<double>> sequencesInFile = new List<List<double>>();
-                for (int i = 0; i < csvLines.Length; i++)
-                {
-                    string[] columns = csvLines[i].Split(new char[] { ',' });
-                    List<double> sequence = new List<double>();
-                    for (int j = 0; j < columns.Length; j++)
-                    {
-                        sequence.Add(double.Parse(columns[j]));
-                    }
-                    sequencesInFile.Add(sequence);
-                }
-                folderSequences.AddRange(sequencesInFile);
-            }
-            return folderSequences;
-        }
-
-        /// <summary>
-        /// This method reads all CSV files in the folder path passed on to the constructor,
-        /// and outputs its contents to the console.
-        /// </summary>
-        public void CSVSequencesConsoleOutput()
-        {
-            List<List<double>> sequences = ReadFolder();
-            // Looping through each sequence and displaying it in the console
-            for (int i = 0; i < sequences.Count; i++)
-            {
-                Console.Write("Sequence " + (i + 1) + ": ");
-                foreach (double number in sequences[i])
-                {
-                    Console.Write(number + " ");
-                }
-                Console.WriteLine("");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Converts a list of sequences to a dictionary of sequences for facilitating HTM Engine training.
-    /// </summary>
-    public class CSVToHTMInput
-    {
-        /// <summary>
-        /// Builds a dictionary of sequences from a list of sequences.
-        /// An unique key is added, which is later used as an input for HtmClassifier.
-        /// </summary>
-        /// <param name="sequences">A list of sequences read from CSV files/files in a folder.</param>
-        /// <returns>A dictionary of sequences required for HTM Engine training.</returns>
-        public Dictionary<string, List<double>> BuildHTMInput(List<List<double>> sequences)
-        {
-            Dictionary<string, List<double>> dictionary = new Dictionary<string, List<double>>();
-            for (int i = 0; i < sequences.Count; i++)
-            {
-                //Unique key created and added to dictionary for HTM Input                
-                string key = "S" + (i + 1);
-                List<double> value = sequences[i];
-                dictionary.Add(key, value);
-            }
-            return dictionary;
-        }
-    }
-
-    /// <summary>
-    /// This class is responsible for training an HTM model.
-    /// The trained model will be further used to detect anomalies. 
-    /// </summary>
-    public class HTMModeltraining
-    {
-        /// <summary>
-        /// Runs the HTM model learning experiment on a folder containing CSV files, and returns the trained model.
-        /// </summary>
-        /// <param name="folderPath">The path to the folder containing the CSV files to be used for training the model.</param>
-        /// <param name="predictor">The trained model that will be used for prediction.</param>
-        public void RunHTMModelLearning(string folderPath, out Predictor predictor)
-        {
-            Console.WriteLine("------------------------------");
-            Console.WriteLine();
-            Console.WriteLine("Starting our anomaly detection experiment!!");
-            Console.WriteLine();
-            Console.WriteLine("------------------------------");
-            Console.WriteLine();
-            Console.WriteLine("HTM Model training initiated...................");
-            //Using stopwatch to calculate the total training time
-            Stopwatch swh = Stopwatch.StartNew();
-
-            //Read sequences from CSV files in the specified folder
-            CSVFolderReader reader = new CSVFolderReader(folderPath);
-            var sequences = reader.ReadFolder();
-
-            //Convert sequences to HTM input format
-            CSVToHTMInput converter = new CSVToHTMInput();
-            var htmInput = converter.BuildHTMInput(sequences);
-
-            //Starting multi-sequence learning experiment to generate predictor model
-            //by passing htmInput 
-            MultiSequenceLearning learning = new MultiSequenceLearning();
-            predictor = learning.Run(htmInput);
-            //Our HTM model training concludes here
-
-            swh.Stop();
-
-            Console.WriteLine();
-            Console.WriteLine("------------------------------");
-            Console.WriteLine();
-            Console.WriteLine("HTM Model trained!! Training time is: " + swh.Elapsed.TotalSeconds + " seconds.");
-            Console.WriteLine();
-            Console.WriteLine("------------------------------");
-        }
-    }
-
     /// <summary>
     /// This class is responsible for testing an HTM model.
     /// Default training/ testing folder path is passed on to the constructor.
     /// Testing is carried out by training model using HTMModeltraining class,
     /// then CSVFolderReader is used to read all the sequences from all the CSV files inside testing folder,
-    /// after that they are tested sequence by sequence. In the end, PredictAnomalyElement method will be used for
+    /// after that they are tested sequence by sequence. In the end, DetectAnomaly method will be used for
     /// testing a sequence as sliding window, one by one item in sequence.
     /// </summary>
     public class HTMAnomalyTesting
@@ -237,7 +38,7 @@ namespace NeoCortexApiSample
         /// <summary>
         /// Runs the anomaly detection experiment.
         /// </summary>
-        public void AnomalyTestRun()
+        public void Run()
         {
             //HTM model training initiated
             HTMModeltraining myModel = new HTMModeltraining();
@@ -250,17 +51,27 @@ namespace NeoCortexApiSample
             Console.WriteLine("Started testing our trained HTM Engine...................");
             Console.WriteLine();
 
+            //CSVFileReader can also be used to read a single file
             //Starting to test our trained HTM model
             CSVFolderReader testseq = new CSVFolderReader(_testingFolderPath);
-            var seq2seq = testseq.ReadFolder();
+            var inputtestseq = testseq.ReadFolder();
             myPredictor.Reset();
 
             //Testing the sequences one by one
-            //Our anomaly detection experiment is complete after all the lists are traversed iteratively
-            foreach (List<double> list in seq2seq)
+            //Our anomaly detection experiment is complete after all the lists are traversed iteratively.
+            //If the list contains less than two values, or contain non-negative values, exception is thrown from DetectAnomaly method.
+            //Errors are handled using exception handling without disrupting our program flow.
+            foreach (List<double> list in inputtestseq)
             {
                 double[] lst = list.ToArray();
-                PredictAnomalyElement(myPredictor, lst);
+                try
+                {
+                    DetectAnomaly(myPredictor, lst);
+                }
+                catch (ArgumentException ex)
+                {
+                    Console.WriteLine($"Exception caught: {ex.Message}");
+                }
             }
 
             Console.WriteLine();
@@ -279,8 +90,23 @@ namespace NeoCortexApiSample
         /// </summary>
         /// <param name="predictor">Trained HTM model, used for prediction.</param>
         /// <param name="list">Input list which will be used to detect anomalies.</param>
-        private static void PredictAnomalyElement(Predictor predictor, double[] list)
+        private static void DetectAnomaly(Predictor predictor, double[] list)
         {
+            //Checking if the list contains at least two values
+            if (list.Length < 2)
+            {
+                throw new ArgumentException($"List must contain at least two values. Actual count: {list.Length}. List: [{string.Join(",", list)}]");
+
+            }
+            //Checking if the list contains any non-numeric values
+            foreach (double value in list)
+            {
+                if (double.IsNaN(value))
+                {
+                    throw new ArgumentException($"List contains non-numeric values. List: [{string.Join(",", list)}]");
+                }
+            }
+
             Console.WriteLine("------------------------------");
             Console.WriteLine();
             Console.WriteLine("Testing the sequence for anomaly detection: " + string.Join(", ", list) + ".");
@@ -297,6 +123,8 @@ namespace NeoCortexApiSample
             //We will not start checking from first element if there is anomaly in the first element.
             bool startFromFirst = true;
 
+            //These are the first and second items from the input list.
+            //These values are neccesary to detect anomaly in the first element of the list.
             double firstItem = list[0];
             double secondItem = list[1];
 
@@ -403,5 +231,4 @@ namespace NeoCortexApiSample
 
         }
     }
-
 }
