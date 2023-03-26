@@ -36,8 +36,16 @@ namespace AnomalyDetectionSample
                 // Loop through each column in the current line
                 for (int j = 0; j < columns.Length; j++)
                 {
-                    // Parsing the current column as double,then adding it to the current sequence
-                    sequence.Add(double.Parse(columns[j]));
+                    // Value of column is parsed as double and added to sequence
+                    // if it fails then exception is thrown
+                    if (double.TryParse(columns[j], out double value))
+                    {
+                        sequence.Add(value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Non-numeric value found! Please check the file.");
+                    }
                 }
                 sequences.Add(sequence);
             }
