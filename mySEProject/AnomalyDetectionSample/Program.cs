@@ -14,7 +14,7 @@ namespace AnomalyDetectionSample
             // Starts experiment that demonstrates how to perform anomaly detection using multisequencelearning.
             // This uses the unsupervised approach.
             // UnsupervisedHTMAnomalyTesting tester1 = new UnsupervisedHTMAnomalyTesting();
-            // tester.Run();
+            // tester1.Run();
 
         }
 
