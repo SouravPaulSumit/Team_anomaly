@@ -11,8 +11,4 @@
     <PackageReference Include="NeoCortexApi" Version="1.1.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="predicting\" />
-  </ItemGroup>
-
 </Project>
