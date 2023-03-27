@@ -4,34 +4,35 @@ using System;
 namespace AnomalyDetectionSample
 {
     /// <summary>
-    /// This class is responsible for testing an HTM model.
-    /// Default training/ testing folder path is passed on to the constructor.
-    /// Testing is carried out by training model using HTMModeltraining class,
-    /// then CSVFolderReader is used to read all the sequences from all the CSV files inside testing folder,
-    /// after that they are tested sequence by sequence. In the end, DetectAnomaly method will be used for
+    /// This class is responsible for testing an HTM model in unsupervised manner. 
+    /// Both training(learning) and predicting files will be used for training our HTM Model.
+    /// Default training(learning) and predicting folder paths are passed on to the constructor.
+    /// Testing is carried out by trained model created using UnsupervisedHTMModeltraining class,
+    /// then CSVFolderReader is used to read all the sequences from all the CSV files inside predicting folder and trimmed,
+    /// after that, the trimmed subsequences are tested sequence by sequence. 
+    /// In the end, DetectAnomaly method will be used for
     /// testing a sequence as sliding window, one by one item in sequence.
     /// </summary>
-    public class HTMAnomalyTesting
+    public class UnsupervisedHTMAnomalyTesting
     {
         private readonly string _trainingFolderPath;
-        private readonly string _testingFolderPath;
+        private readonly string _predictingFolderPath;
 
         /// <summary>
-        /// Creates a new instance of the CSVFolderReader class with the provided file path to the constructor.
-        /// Default training/ testing folder path is passed on to the constructor.
+        /// Default training(learning)/ predicting folder paths are passed on to the constructor.
         /// </summary>
-        /// <param name="trainingFolderPath">The path to the folder containing the CSV files for training.</param>
-        ///<param name="testingFolderPath">The path to the folder containing the CSV files for testing.</param>
-        public HTMAnomalyTesting(string trainingFolderPath = "training", string testingFolderPath = "testing")
+        /// <param name="trainingFolderPath">The path to the folder containing the CSV files for training(learning).</param>
+        ///<param name="predictingFolderPath">The path to the folder containing the CSV files for predicting.</param>
+        public UnsupervisedHTMAnomalyTesting(string trainingFolderPath = "training", string predictingFolderPath = "predicting")
         {
             // Folder directory set to location of C# files. This is the relative path.
             string projectbaseDirectory = Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.Parent!.FullName;
             _trainingFolderPath = Path.Combine(projectbaseDirectory, trainingFolderPath);
-            _testingFolderPath = Path.Combine(projectbaseDirectory, testingFolderPath);
+            _predictingFolderPath = Path.Combine(projectbaseDirectory, predictingFolderPath);
 
             // Use the bottom path variables if you want to override to specify path on your own
             // _trainingFolderPath = "";
-            // _testingFolderPath = "";
+            // _predictingFolderPath = "";
 
         }
 
@@ -41,27 +42,31 @@ namespace AnomalyDetectionSample
         public void Run()
         {
             // HTM model training initiated
-            HTMModeltraining myModel = new HTMModeltraining();
+            UnsupervisedHTMModeltraining myModel = new UnsupervisedHTMModeltraining();
             Predictor myPredictor;
 
-            myModel.RunHTMModelLearning(_trainingFolderPath, out myPredictor);
+            myModel.RunHTMModelLearning(_trainingFolderPath, _predictingFolderPath, out myPredictor);
 
             Console.WriteLine("------------------------------");
             Console.WriteLine();
             Console.WriteLine("Started testing our trained HTM Engine...................");
             Console.WriteLine();
 
-            // CSVFileReader can also be used to read a single file
             // Starting to test our trained HTM model
-            CSVFolderReader testseq = new CSVFolderReader(_testingFolderPath);
+
+            // CSVFileReader can also be used in place of CSVFolderReader to read a single file
+            // We will take sequences from predicting folder
+            // After that, we will then trim those sequences: sequences where first few elements are removed, for anomaly detection
+            CSVFolderReader testseq = new CSVFolderReader(_predictingFolderPath);
             var inputtestseq = testseq.ReadFolder();
+            var triminputtestseq = CSVFolderReader.TrimSequences(inputtestseq);
             myPredictor.Reset();
 
             // Testing the sequences one by one
             // Our anomaly detection experiment is complete after all the lists are traversed iteratively.
             // If the list contains less than two values, or contain non-negative values, exception is thrown from DetectAnomaly method.
             // Errors are handled using exception handling without disrupting our program flow.
-            foreach (List<double> list in inputtestseq)
+            foreach (List<double> list in triminputtestseq)
             {
                 double[] lst = list.ToArray();
                 try
@@ -236,5 +241,6 @@ namespace AnomalyDetectionSample
 
 
         }
+
     }
 }

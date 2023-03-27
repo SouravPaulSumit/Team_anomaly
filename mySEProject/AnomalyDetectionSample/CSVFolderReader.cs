@@ -26,18 +26,35 @@ namespace AnomalyDetectionSample
         public List<List<double>> ReadFolder()
         {
             List<List<double>> folderSequences = new List<List<double>>();
+
+            // All the CSV files present inside the folder are taken
             string[] fileEntries = Directory.GetFiles(_folderPathToCSV, "*.csv");
+
+            // Iterating through each CSV file inside the folder
             foreach (string fileName in fileEntries)
             {
                 string[] csvLines = File.ReadAllLines(fileName);
                 List<List<double>> sequencesInFile = new List<List<double>>();
+
+                // Looping through each line in the current CSV file
                 for (int i = 0; i < csvLines.Length; i++)
                 {
                     string[] columns = csvLines[i].Split(new char[] { ',' });
                     List<double> sequence = new List<double>();
+
+                    // Loop through each column in the current line
                     for (int j = 0; j < columns.Length; j++)
                     {
-                        sequence.Add(double.Parse(columns[j]));
+                        // Value of column is parsed as double and added to sequence
+                        // if it fails then exception is thrown
+                        if (double.TryParse(columns[j], out double value))
+                        {
+                            sequence.Add(value);
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Non-numeric value found! Please check file: {fileName}.");
+                        }
                     }
                     sequencesInFile.Add(sequence);
                 }
@@ -64,5 +81,27 @@ namespace AnomalyDetectionSample
                 Console.WriteLine("");
             }
         }
+
+        /// <summary>
+        /// Trims a random number of elements (between 1 and 4) from the beginning of each sequence in a list of sequences.
+        /// </summary>
+        /// <param name="sequences">The list of sequences to trim.</param>
+        /// <returns>A new list of trimmed sequences.</returns>
+        public static List<List<double>> TrimSequences(List<List<double>> sequences)
+        {
+            Random rnd = new Random();
+            List<List<double>> trimmedSequences = new List<List<double>>();
+
+            foreach (List<double> sequence in sequences)
+            {
+                // Generate a random number between 1 and 4
+                int numElementsToRemove = rnd.Next(1, 5);
+                List<double> trimmedSequence = sequence.Skip(numElementsToRemove).ToList();
+                trimmedSequences.Add(trimmedSequence);
+            }
+
+            return trimmedSequences;
+        }
+
     }
 }

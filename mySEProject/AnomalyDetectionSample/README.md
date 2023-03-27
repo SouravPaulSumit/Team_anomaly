@@ -189,6 +189,64 @@ return new Predictor(layer1, mem, cls)
 `````
 We will use this for prediction.
 
+## Execution of the project
+
+Our project is executed in the following way. 
+
+* In the beginning, we use [CSVFolderReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFolderReader.cs) class to read all the files placed inside the training folder. Alternatively, we can use [CSVFileReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFileReader.cs) to read a single file. These classes store the read sequences to a list of sequences.
+
+```csharp
+List<List<double>> folderSequences = new List<List<double>>();
+.....
+return folderSequences;
+```
+
+* After that, the [CSVToHTMInput](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVToHTMInput.cs) class converts all the read sequences to a format suitable for HTM training.
+```csharp
+Dictionary<string, List<double>> dictionary = new Dictionary<string, List<double>>();
+            for (int i = 0; i < sequences.Count; i++)
+            {
+                // Unique key created and added to dictionary for HTM Input                
+                string key = "S" + (i + 1);
+                List<double> value = sequences[i];
+                dictionary.Add(key, value);
+            }
+            return dictionary;
+```
+* After that, we use [HTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMModeltraining.cs) class to train our model using the converted sequences. This class returns our trained model object predictor.
+```csharp
+.....
+MultiSequenceLearning learning = new MultiSequenceLearning();
+predictor = learning.Run(htmInput);
+.....
+```
+
+* In the end, we use [HTMAnomalyTesting](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMAnomalyTesting.cs) to detected anomalies in sequences read from files inside testing folder. All the above steps are executed for reading CSV files, converting them for HTM training and training the HTM engine using HTMModelTraining class. We use the same class (CSVFolderReader) to read files for our testing sequences.
+```csharp
+CSVFolderReader testseq = new CSVFolderReader(_testingFolderPath);
+var inputtestseq = testseq.ReadFolder();
+```
+Path to training and testing folder is set as default and passed on the constructor, or can be set inside the class manually.
+```csharp
+.....
+_trainingFolderPath = Path.Combine(projectbaseDirectory, trainingFolderPath);
+_testingFolderPath = Path.Combine(projectbaseDirectory, testingFolderPath);
+.....
+```
+In the end, DetectAnomaly method is used to detect anomalies in our test sequences one by one, using our trained HTM Model predictor.
+```csharp
+foreach (List<double> list in inputtestseq)
+       {
+         .....
+         double[] lst = list.ToArray();
+         DetectAnomaly(myPredictor, lst);
+       }
+```
+
+DetectAnomaly method traverses each value by one, and uses trained model predictor to predict the next element for comparison. We use an anomalyscore to quantify the comparison and detect anomalies; if the prediction crosses a certain tolerance level, it is declared as an anomaly.
+
+In our sliding window approach, naturally the first element is skipped, so we ensure that the first element is checked for anomaly in the beginning.
+
 ## Results
 
 After running this project, we got the following [output](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/raw_output.txt).

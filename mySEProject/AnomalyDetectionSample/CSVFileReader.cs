@@ -36,8 +36,16 @@ namespace AnomalyDetectionSample
                 // Loop through each column in the current line
                 for (int j = 0; j < columns.Length; j++)
                 {
-                    // Parsing the current column as double,then adding it to the current sequence
-                    sequence.Add(double.Parse(columns[j]));
+                    // Value of column is parsed as double and added to sequence
+                    // if it fails then exception is thrown
+                    if (double.TryParse(columns[j], out double value))
+                    {
+                        sequence.Add(value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Non-numeric value found! Please check the file.");
+                    }
                 }
                 sequences.Add(sequence);
             }
@@ -61,6 +69,27 @@ namespace AnomalyDetectionSample
                 }
                 Console.WriteLine("");
             }
+        }
+
+        /// <summary>
+        /// Trims a random number of elements (between 1 and 4) from the beginning of each sequence in a list of sequences.
+        /// </summary>
+        /// <param name="sequences">The list of sequences to trim.</param>
+        /// <returns>A new list of trimmed sequences.</returns>
+        public static List<List<double>> TrimSequences(List<List<double>> sequences)
+        {
+            Random rnd = new Random();
+            List<List<double>> trimmedSequences = new List<List<double>>();
+
+            foreach (List<double> sequence in sequences)
+            {
+                // Generate a random number between 1 and 4
+                int numElementsToRemove = rnd.Next(1, 5);
+                List<double> trimmedSequence = sequence.Skip(numElementsToRemove).ToList();
+                trimmedSequences.Add(trimmedSequence);
+            }
+
+            return trimmedSequences;
         }
     }
 }

@@ -1,21 +1,18 @@
 ﻿using NeoCortexApi;
-using System;
 using System.Diagnostics;
+
 
 namespace AnomalyDetectionSample
 {
-    /// <summary>
-    /// This class is responsible for training an HTM model.
-    /// The trained model will be further used to detect anomalies. 
-    /// </summary>
-    public class HTMModeltraining
+    public class UnsupervisedHTMModeltraining
     {
         /// <summary>
-        /// Runs the HTM model learning experiment on a folder containing CSV files, and returns the trained model.
+        /// Runs the HTM model learning experiment on folders containing CSV files, and returns the trained model.
         /// </summary>
-        /// <param name="folderPath">The path to the folder containing the CSV files to be used for training the model.</param>
+        /// <param name="trainingfolderPath">The path to the folder containing the CSV files to be used for training(learning).</param>
+        /// <param name="predictingfolderPath">The path to the folder containing the CSV files which contains sequences for prediction.</param>
         /// <param name="predictor">The trained model that will be used for prediction.</param>
-        public void RunHTMModelLearning(string folderPath, out Predictor predictor)
+        public void RunHTMModelLearning(string trainingfolderPath, string predictingfolderPath, out Predictor predictor)
         {
             Console.WriteLine("------------------------------");
             Console.WriteLine();
@@ -27,14 +24,24 @@ namespace AnomalyDetectionSample
             // Using stopwatch to calculate the total training time
             Stopwatch swh = Stopwatch.StartNew();
 
-            // Read sequences from CSV files in the specified folder
+            // Read sequences from CSV files in the specified folder containing files having training(learning) sequences
             // CSVFileReader class can also be used for single files
-            CSVFolderReader reader = new CSVFolderReader(folderPath);
-            var sequences = reader.ReadFolder();
+            CSVFolderReader reader = new CSVFolderReader(trainingfolderPath);
+            var sequences1 = reader.ReadFolder();
+
+            // Read sequences from CSV files in the specified folder containing files having prediction sequences
+            // CSVFileReader class can also be used for single files
+            CSVFolderReader reader1 = new CSVFolderReader(predictingfolderPath);
+            var sequences2 = reader1.ReadFolder();
+
+            // Combine these sequences for using both training(learning) and predicting sequences
+            // We will use both of them to feed into HTM Model for training
+            List<List<double>> combinedSequences = new List<List<double>>(sequences1);
+            combinedSequences.AddRange(sequences2);
 
             // Convert sequences to HTM input format
             CSVToHTMInput converter = new CSVToHTMInput();
-            var htmInput = converter.BuildHTMInput(sequences);
+            var htmInput = converter.BuildHTMInput(combinedSequences);
 
             // Starting multi-sequence learning experiment to generate predictor model
             // by passing htmInput 
@@ -52,5 +59,6 @@ namespace AnomalyDetectionSample
             Console.WriteLine();
             Console.WriteLine("------------------------------");
         }
+
     }
 }
