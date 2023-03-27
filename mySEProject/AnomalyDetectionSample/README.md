@@ -185,13 +185,15 @@ We will use this for prediction in later parts of our project.
 
 Our project is executed in the following way. 
 
-* In the beginning, we use [CSVFolderReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFolderReader.cs) class to read all the files placed inside a folder. Alternatively, we can use [CSVFileReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFileReader.cs) to read a single file; it works in a similar way, except that it reads a single file. These classes store the read sequences to a list of numeric sequences, which will be used in a number of occasions later. These classes have exception handling implemented inside for handling non-numeric data. Data can be trimmed using TrimSequences method, which will be used in our unsupervised approach. Trimsequences method trims one to four elements(Number 1 to 4 is decided randomly) from the beginning of a numeric sequence and returns it.
+* In the beginning, we use ReadFolder method of [CSVFolderReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFolderReader.cs) class to read all the files placed inside a folder. Alternatively, we can use ReadFile method of [CSVFileReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFileReader.cs) to read a single file; it works in a similar way, except that it reads a single file. These classes store the read sequences to a list of numeric sequences, which will be used in a number of occasions later. These classes have exception handling implemented inside for handling non-numeric data. Data can be trimmed using TrimSequences method, which will be used in our unsupervised approach. Trimsequences method trims one to four elements(Number 1 to 4 is decided randomly) from the beginning of a numeric sequence and returns it.
 
 ```csharp
-List<List<double>> folderSequences = new List<List<double>>();
-.....
-return folderSequences;
-.....
+ public List<List<double>> ReadFolder()
+        {
+         ....  
+          return folderSequences;
+        }
+
 public static List<List<double>> TrimSequences(List<List<double>> sequences)
         {
         ....
@@ -199,7 +201,7 @@ public static List<List<double>> TrimSequences(List<List<double>> sequences)
         }
 ```
 
-* After that, the [CSVToHTMInput](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVToHTMInput.cs) class converts all the read sequences to a format suitable for HTM training.
+* After that, the method BuildHTMInput of [CSVToHTMInput](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVToHTMInput.cs) class converts all the read sequences to a format suitable for HTM training.
 ```csharp
 Dictionary<string, List<double>> dictionary = new Dictionary<string, List<double>>();
 for (int i = 0; i < sequences.Count; i++)
@@ -211,7 +213,7 @@ for (int i = 0; i < sequences.Count; i++)
     }
      return dictionary;
 ```
-* After that, we use [HTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMModeltraining.cs) class to train our model using the converted sequences in supervised approach. This class returns our trained model object predictor.
+* After that, we use RunHTMModelLearning method of [HTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMModeltraining.cs) class to train our model using the converted sequences in supervised approach. This class returns our trained model object predictor.
 ```csharp
 .....
 MultiSequenceLearning learning = new MultiSequenceLearning();
@@ -219,7 +221,7 @@ predictor = learning.Run(htmInput);
 .....
 ```
 
-For unsupervised approach, we use [UnsupervisedHTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/UnsupervisedHTMModeltraining.cs), which works in a similar manner, except of one major feature. It combines the numerical data sequences from training (for learning) and predicting folders. RunHTMModelLearning method also takes one extra parameter(path of predicting folder)
+For unsupervised approach, we use RunHTMModelLearning method of [UnsupervisedHTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/UnsupervisedHTMModeltraining.cs), which works in a similar manner, except of one major feature. It combines the numerical data sequences from training (for learning) and predicting folders. RunHTMModelLearning method also takes one extra parameter (path of predicting folder)
 ```csharp
 .....
 List<List<double>> combinedSequences = new List<List<double>>(sequences1);
@@ -262,13 +264,13 @@ foreach (List<double> list in inputtestseq)
 ```
 For unsupervised approach, trimmed sequences are passed to the loop. 
 
-Exception handling is coded, such that errors thrown from DetectAnomaly method can be handled(like passing of non-numeric values, or number of elements in list less than 2).
+Exception handling is coded, such that errors thrown from DetectAnomaly method can be handled(like passing of non-numeric values, or number of elements in list less than two).
 
 DetectAnomaly method works similarly for both our approaches. It is the main method which detects anoamlies in our data. It traverses each value of a list one by one in a sliding window manner, and uses trained model predictor to predict the next element for comparison. We use an anomalyscore to quantify the comparison and detect anomalies; if the prediction crosses a certain tolerance level, it is declared as an anomaly.
 
 In our sliding window approach, naturally the first element is skipped, so we ensure that the first element is checked for anomaly in the beginning.
 
-We can get our prediction in a list of results in format of NeoCortexApi.Classifiers.ClassifierResult`1[System.String] from our trained model Predictor using the following:
+We can get our prediction in a list of results in format of "NeoCortexApi.Classifiers.ClassifierResult`1[System.String]" from our trained model Predictor using the following:
 
 ```csharp
 var res = predictor.Predict(item);
@@ -291,7 +293,7 @@ We know that the item we passed here is 8. The first line gives us the best pred
 
 We will then use this to detect anomalies.
 
-* When we iteratively pass values to DetectAnomaly method using our sliding window approach, we will not be able to detect anomaly in the first element. So, in the beginning, we use the second element of the list to predict and compare the previous element(which is the first element). A flag is set to control the loop; if the first element has anomaly, then we will not use it to detect our second element. We will directly start from first element. Otherwise, we will start from first element as usual.
+* When we iteratively pass values to DetectAnomaly method using our sliding window approach, we will not be able to detect anomaly in the first element. So, in the beginning, we use the second element of the list to predict and compare the previous element(which is the first element). A flag is set to control the command execution; if the first element has anomaly, then we will not use it to detect our second element. We will directly start from first element. Otherwise, we will start from first element as usual.
 
 * Now, when we traverse the list one by one to the right, we pass the value to the predictor to get the next value and compare the prediction with the actual value. If there's anomaly, then it is outputted to the user, and the anomalous element is skipped. Upon reaching to the last element, we can end our traversal and move on to next list.
 
