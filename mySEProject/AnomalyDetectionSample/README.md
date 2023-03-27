@@ -58,7 +58,7 @@ Normally, the values stay within the range of 45 to 55. For testing, we consider
 2. Graph for numerical sequence data (with few elements removed in the front) from testing folder (with anomalies) can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/testing_data_for_supervised_learn_plot.jpg).
 3. Graph of combined numerical sequence data from training folder (without anomalies) and predicting folder (with anomalies) can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/combined_data_for_unsup_learn_data_plot.jpg).
 
-Data used in points 1 and 2 will be used for our supervised approach. Data from 1 and 3 will be used in our unsupervised approach.
+Data used in points 1 and 2 will be used for our supervised approach. Data from 3 will be used in our unsupervised approach.
 
 ### Encoding:
 
@@ -185,12 +185,18 @@ We will use this for prediction in later parts of our project.
 
 Our project is executed in the following way. 
 
-* In the beginning, we use [CSVFolderReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFolderReader.cs) class to read all the files placed inside a folder. Alternatively, we can use [CSVFileReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFileReader.cs) to read a single file. These classes store the read sequences to a list of sequences.
+* In the beginning, we use [CSVFolderReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFolderReader.cs) class to read all the files placed inside a folder. Alternatively, we can use [CSVFileReader](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVFileReader.cs) to read a single file; it works in a similar way, except that it reads a single file. These classes store the read sequences to a list of numeric sequences, which will be used in a number of occasions later. These classes have exception handling implemented inside for handling non-numeric data. Data can be trimmed using TrimSequences method, which will be used in our unsupervised approach. Trimsequences method trims one to four elements(Number 1 to 4 is decided randomly) from the beginning of a numeric sequence and returns it.
 
 ```csharp
 List<List<double>> folderSequences = new List<List<double>>();
 .....
 return folderSequences;
+.....
+public static List<List<double>> TrimSequences(List<List<double>> sequences)
+        {
+        ....
+          return trimmedSequences;
+        }
 ```
 
 * After that, the [CSVToHTMInput](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/CSVToHTMInput.cs) class converts all the read sequences to a format suitable for HTM training.
@@ -205,7 +211,7 @@ for (int i = 0; i < sequences.Count; i++)
     }
      return dictionary;
 ```
-* After that, we use [HTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMModeltraining.cs) class to train our model using the converted sequences. This class returns our trained model object predictor.
+* After that, we use [HTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMModeltraining.cs) class to train our model using the converted sequences in supervised approach. This class returns our trained model object predictor.
 ```csharp
 .....
 MultiSequenceLearning learning = new MultiSequenceLearning();
@@ -213,7 +219,14 @@ predictor = learning.Run(htmInput);
 .....
 ```
 
-* In the end, we use [HTMAnomalyTesting](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMAnomalyTesting.cs) to detected anomalies in sequences read from files inside testing folder. All the above steps are executed for reading CSV files, converting them for HTM training and training the HTM engine using HTMModelTraining class. We use the same class (CSVFolderReader) to read files for our testing sequences.
+For unsupervised approach, we use [UnsupervisedHTMModeltraining](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/UnsupervisedHTMModeltraining.cs), which works in a similar manner, except of one major feature. It combines the numerical data sequences from training (for learning) and predicting folders. RunHTMModelLearning method also takes one extra parameter(path of predicting folder)
+```csharp
+.....
+List<List<double>> combinedSequences = new List<List<double>>(sequences1);
+combinedSequences.AddRange(sequences2);
+.....
+```
+* In the end, we use [HTMAnomalyTesting](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMAnomalyTesting.cs) to detected anomalies in sequences read from files inside testing folder using supervised approach. All the steps explained earlier- CSV files reading, converting them for HTM training and training the HTM engine using HTMModelTraining class are done here. We use the same class (CSVFolderReader) to read files for our testing sequences.
 ```csharp
 CSVFolderReader testseq = new CSVFolderReader(_testingFolderPath);
 var inputtestseq = testseq.ReadFolder();
@@ -225,7 +238,20 @@ _trainingFolderPath = Path.Combine(projectbaseDirectory, trainingFolderPath);
 _testingFolderPath = Path.Combine(projectbaseDirectory, testingFolderPath);
 .....
 ```
-In the end, DetectAnomaly method is used to detect anomalies in our test sequences one by one, using our trained HTM Model predictor.
+
+In case of our unsupervised approach, we use [UnsupervisedHTMModelTesting](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/UnsupervisedHTMAnomalyTesting.cs) class, which also works in a similar fashion as HTMAnomalyTesting class, except for the following.
+
+We pass paths to training and predicting folder to the constructor.
+
+```csharp
+.....
+ _trainingFolderPath = Path.Combine(projectbaseDirectory, trainingFolderPath);
+_predictingFolderPath = Path.Combine(projectbaseDirectory, predictingFolderPath);
+.....
+```
+and, TrimSequences method is used to trim sequences for testing. Method for trimming is already explained earlier.
+
+In the end, DetectAnomaly method is used to detect anomalies in our test sequences one by one, using our trained HTM Model predictor. For supervise learning, the numerical sequences from testing data is passed to the loop. 
 ```csharp
 foreach (List<double> list in inputtestseq)
        {
@@ -234,8 +260,11 @@ foreach (List<double> list in inputtestseq)
          DetectAnomaly(myPredictor, lst);
        }
 ```
+For unsupervised approach, trimmed sequences are passed to the loop. 
 
-DetectAnomaly method traverses each value by one, and uses trained model predictor to predict the next element for comparison. We use an anomalyscore to quantify the comparison and detect anomalies; if the prediction crosses a certain tolerance level, it is declared as an anomaly.
+Exception handling is coded, such that errors thrown from DetectAnomaly method can be handled(like passing of non-numeric values, or number of elements in list less than 2).
+
+DetectAnomaly method works similarly for both our approaches. It is the main method which detects anoamlies in our data. It traverses each value of a list one by one in a sliding window manner, and uses trained model predictor to predict the next element for comparison. We use an anomalyscore to quantify the comparison and detect anomalies; if the prediction crosses a certain tolerance level, it is declared as an anomaly.
 
 In our sliding window approach, naturally the first element is skipped, so we ensure that the first element is checked for anomaly in the beginning.
 
@@ -292,6 +321,6 @@ Our supervised approach got the following [results](https://github.com/SouravPau
 
 Our unsupervised approach got the following [results](https://github.com/SouravPaulSumit/Team_anomaly/tree/master/mySEProject/AnomalyDetectionSample/output/unsupervised).
 
-We can observed that lower false positive rate is observed in our supervised approach (Avg of both runs: 0.15) than unsupervised one (0.24), It is desired that false positive rate should be as lower as possible in an anomaly detection program. 
+We can observed that lower false positive rate is observed in our supervised approach (Avg of both runs: 0.15) than unsupervised one (0.24), It is desired that false positive rate should be as lower as possible in an anomaly detection program. Lower false negative rate is also desirable in some cases.
 
 Although, it depends on a number of factors, like quantity(the more, the better) and quality of data, and hyperparameters used to tune and train model. In both our approaches, more data should be used for training, and hyperparameters should be further tuned to find the most optimal setting for training to get the best results. We were using less amount of data sequences to demonstrate our sample project due to time and computational constraints, but that can be improved if we use better resources, like cloud.
