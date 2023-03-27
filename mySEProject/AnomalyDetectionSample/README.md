@@ -24,7 +24,7 @@ To run this project,
 
 * Install .NET SDK. Then using code editor/IDE of your choice, create a new console project and place all the C# codes inside your project folder. 
 * Add/reference nuget package NeoCortexApi v1.1.4 to this project.
-* Place training and testing datasets under training and testing folder respectively. Both the folders should be inside the project folder.
+* Place numerical sequence CSV Files (datasets) under relevant folders respectively. All the folders should be inside the project folder. More details given below.
 
 Our project is based on NeoCortex API. More details [here](https://github.com/ddobric/neocortexapi/blob/master/source/Documentation/gettingStarted.md).
 
