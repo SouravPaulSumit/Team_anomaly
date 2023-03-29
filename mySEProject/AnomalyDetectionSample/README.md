@@ -259,13 +259,13 @@ We know that the item we passed here is 8. The first line gives us the best pred
 
 We will then use this to detect anomalies.
 
-* When we iteratively pass values to DetectAnomaly method using our sliding window approach, we will not be able to detect anomaly in the first element. So, in the beginning, we use the second element of the list to predict and compare the previous element (which is the first element). A flag is set to control the command execution; if the first element has anomaly, then we will not use it to detect our second element. We will directly start from first element. Otherwise, we will start from first element as usual.
+* When we iteratively pass values to DetectAnomaly method using our sliding window approach, we will not be able to detect anomaly in the first element. So, in the beginning, we use the second element of the list to predict and compare the previous element (which is the first element). A flag is set to control the command execution; if the first element has anomaly, then we will not use it to detect our second element. We will directly start from second element. Otherwise, we will start from first element as usual.
 
 * Now, when we traverse the list one by one to the right, we pass the value to the predictor to get the next value and compare the prediction with the actual value. If there's anomaly, then it is outputted to the user, and the anomalous element is skipped. Upon reaching to the last element, we can end our traversal and move on to next list.
 
-In both the scenarios, we use anomalyscore (difference ratio) for comparison with our preset threshold. When it exceeds, probable anomalies are found.
+We use anomalyscore (difference ratio) for comparison with our already preset threshold. When it exceeds, probable anomalies are found.
 
-To test out data using supervised, or unsupervised approach, just use the relevant class/methods given in [Program.cs](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/Program.cs).
+To run this project, use the following class/methods given in [Program.cs](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/Program.cs).
 
 ```csharp
   //This is the supervised approach
@@ -279,8 +279,8 @@ To test out data using supervised, or unsupervised approach, just use the releva
  
 # Results
 
-After running this project, we got the following [output]().
+After running this project, we got the following [output](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/raw_output.txt).
 
 We can observe that the false negative rate is high in our output (0.65). It is desired that false negative rate should be as lower as possible in an anomaly detection program. Lower false positive rate is also desirable, but not absolutely essential.
 
-Although, it depends on a number of factors, like quantity (the more, the better) and quality of data, and hyperparameters used to tune and train model; more data should be used for training, and hyperparameters should be further tuned to find the most optimal setting for training to get the best results. We were using less amount of data sequences to demonstrate our sample project due to time and computational constraints, but that can be improved if we use better resources, like cloud.
+Although, it depends on a number of factors, like quantity (the more, the better) and quality of data, and hyperparameters used to tune and train model; more data should be used for training, and hyperparameters should be further tuned to find the most optimal setting for training to get the best results. We were using less amount of numerical sequences as data to demonstrate our sample project due to time and computational constraints, but that can be improved if we use better resources, like cloud.
