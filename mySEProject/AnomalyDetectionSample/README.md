@@ -210,9 +210,11 @@ combinedSequences.AddRange(sequences2);
 ```
 * In the end, we use [HTMAnomalyTesting](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/HTMAnomalyTesting.cs) to detected anomalies in sequences read from files inside predicting folder. All the classes explained earlier- CSV files reading (CSVFileReader), combining and converting them for HTM training (CSVToHTMInput) and training the HTM engine (using HTMModelTraining) will be used here. We use the same class (CSVFolderReader) to read files for our predicting sequences. TrimSequences method is then used to trim sequences for anomaly testing. Method for trimming is already explained earlier.
 ```csharp
+.....
 CSVFolderReader testseq = new CSVFolderReader(_predictingFolderPath);
 var inputtestseq = testseq.ReadFolder();
 var triminputtestseq = CSVFolderReader.TrimSequences(inputtestseq);
+.....
 ```
 Path to training and predicting folder is set as default and passed on the constructor, or can be set inside the class manually.
 
@@ -224,7 +226,7 @@ _predictingFolderPath = Path.Combine(projectbaseDirectory, predictingFolderPath)
 ```
 In the end, DetectAnomaly method is used to detect anomalies in our trimmed sequences one by one, using our trained HTM Model predictor. 
 ```csharp
-foreach (List<double> list in inputtestseq)
+foreach (List<double> list in triminputtestseq)
        {
          .....
          double[] lst = list.ToArray();
@@ -269,13 +271,8 @@ We use anomalyscore (difference ratio) for comparison with our already preset th
 To run this project, use the following class/methods given in [Program.cs](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/Program.cs).
 
 ```csharp
-  //This is the supervised approach
  HTMAnomalyTesting tester = new HTMAnomalyTesting();
  tester.Run();
-
- // This uses the unsupervised approach.
- UnsupervisedHTMAnomalyTesting tester1 = new UnsupervisedHTMAnomalyTesting();
- tester1.Run();
 ```
  
 # Results
