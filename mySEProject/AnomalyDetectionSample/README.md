@@ -37,7 +37,7 @@ In this approach, we are going to read and use data from both our training (lear
 
 Please note that all files are read with .csv extension inside the folders, and exception handlers are in place if the format of the files are not in proper order.
 
-For this project, we are using a sample time series data of network load (rounded off to nearest integer, in precentage). The data is kept as numerical sequences inside the csv files. Example of a csv file withing training folder.
+For this project, we are using a sample time series data of network load (rounded off to nearest integer, in precentage). The data is kept as numerical sequences inside the csv files. Example of a csv file within training folder.
 
 ```
 49,52,55,48,52,47,46,50,52,47
@@ -306,7 +306,7 @@ To test out data using supervised, or unsupervised approach, just use the releva
  tester1.Run();
 ```
  
-## Results
+# Results
 
 After running this project, we got the following output:
 
