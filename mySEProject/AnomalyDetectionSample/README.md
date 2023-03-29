@@ -25,19 +25,11 @@ Our project is based on NeoCortex API. More details [here](https://github.com/dd
 
 # Details
 
-We have used [MultiSequenceLearning](https://github.com/ddobric/neocortexapi/blob/master/source/Samples/NeoCortexApiSample/MultisequenceLearning.cs) class in NeoCortex API for training our HTM Engine. We are using two approaches in our project,
-
-* Supervised learning approach:
-
-In this approach, we are going to read and use data from our training folder (present as numerical sequences in CSV Files in 'training' folder inside project directory) to train HTM Engine. After that, we will use the trained HTM Engine to detect anomalies in our testing data (present as numerical sequences in CSV Files in 'testing' folder inside project directory, which will be read). The numerical sequence data present inside the 'testing' folder are subsequences(first few elements removed) of original training sequences with added anomalies.
-
-* Unsupervised learning approach: 
-
-In this approach, we are going to read and use data from both our training (learning) folder (present as numerical sequences in CSV Files in 'training' folder inside project directory) and predicting folder (present as numerical sequences in CSV Files in 'predicting' folder inside project directory) to train HTM Engine. For testing purposes, we are going to read numerical sequence data from predicting folder and remove the first few elements (essentially, making it subsequence of the original sequence; we already added anomalies in this data at random indexes), and then use it to detect anomalies.
+We have used [MultiSequenceLearning](https://github.com/ddobric/neocortexapi/blob/master/source/Samples/NeoCortexApiSample/MultisequenceLearning.cs) class in NeoCortex API for training our HTM Engine. We are going to start by reading and using data from both our training (learning) folder (present as numerical sequences in CSV Files in 'training' folder inside project directory) and predicting folder (present as numerical sequences in CSV Files in 'predicting' folder inside project directory) to train HTM Engine. For testing purposes, we are going to read numerical sequence data from predicting folder and remove the first few elements (essentially, making it subsequence of the original sequence; we already added anomalies in this data at random indexes), and then use it to detect anomalies.
 
 Please note that all files are read with .csv extension inside the folders, and exception handlers are in place if the format of the files are not in proper order.
 
-For this project, we are using a sample time series data of network load (rounded off to nearest integer, in precentage). The data is kept as numerical sequences inside the csv files. Example of a csv file within training folder.
+For this project, we are using artificial integer sequence data of network load (rounded off to nearest integer, in precentage), which are stored inside the csv files. Example of a csv file within training folder.
 
 ```
 49,52,55,48,52,47,46,50,52,47
@@ -50,10 +42,7 @@ For this project, we are using a sample time series data of network load (rounde
 Normally, the values stay within the range of 45 to 55. For testing, we consider anything outside this range to be an anomaly. We have uploaded the graphs of our data in this repository for reference. 
 
 1. Graph for numerical sequence data from training folder (without anomalies) can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/training_data_for_supervised_learn_plot.jpg).
-2. Graph for numerical sequence data (with few elements removed in the front) from testing folder (with anomalies) can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/testing_data_for_supervised_learn_plot.jpg).
-3. Graph of combined numerical sequence data from training folder (without anomalies) and predicting folder (with anomalies) can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/combined_data_for_unsup_learn_data_plot.jpg).
-
-Data used in points 1 and 2 will be used for our supervised approach. Data from 3 will be used in our unsupervised approach.
+2. Graph of combined numerical sequence data from training folder (without anomalies) and predicting folder (with anomalies) can be found [here](https://github.com/SouravPaulSumit/Team_anomaly/blob/master/mySEProject/AnomalyDetectionSample/output/combined_data_for_unsup_learn_data_plot.jpg).
 
 ### Encoding:
 
