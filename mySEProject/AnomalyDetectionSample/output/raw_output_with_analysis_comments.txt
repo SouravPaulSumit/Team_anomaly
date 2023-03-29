@@ -1,5 +1,4 @@
 ------------------------------
-Remarks for unsupervised approach:
 
 Anomaly detection results:
 False Negative rate
